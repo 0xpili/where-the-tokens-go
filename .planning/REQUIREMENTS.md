@@ -75,40 +75,40 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MEAS-01 | Pending | Pending |
-| MEAS-02 | Pending | Pending |
-| MEAS-03 | Pending | Pending |
-| MEAS-04 | Pending | Pending |
-| MEAS-05 | Pending | Pending |
-| MEAS-06 | Pending | Pending |
-| MEAS-07 | Pending | Pending |
-| MEAS-08 | Pending | Pending |
-| CTX-01 | Pending | Pending |
-| CTX-02 | Pending | Pending |
-| CTX-03 | Pending | Pending |
-| CTX-04 | Pending | Pending |
-| CTX-05 | Pending | Pending |
-| CTX-06 | Pending | Pending |
-| CTX-07 | Pending | Pending |
-| CTX-08 | Pending | Pending |
-| OUT-01 | Pending | Pending |
-| OUT-02 | Pending | Pending |
-| OUT-03 | Pending | Pending |
-| OUT-04 | Pending | Pending |
-| REV-01 | Pending | Pending |
-| REV-02 | Pending | Pending |
-| REV-03 | Pending | Pending |
-| REV-04 | Pending | Pending |
-| DEL-01 | Pending | Pending |
-| DEL-02 | Pending | Pending |
-| DEL-03 | Pending | Pending |
-| DEL-04 | Pending | Pending |
+| MEAS-01 | Phase 1 | Pending |
+| MEAS-02 | Phase 1 | Pending |
+| MEAS-03 | Phase 1 | Pending |
+| MEAS-04 | Phase 1 | Pending |
+| MEAS-05 | Phase 1 | Pending |
+| MEAS-06 | Phase 1 | Pending |
+| MEAS-07 | Phase 1 | Pending |
+| MEAS-08 | Phase 1 | Pending |
+| REV-01 | Phase 1 | Pending |
+| CTX-01 | Phase 2 | Pending |
+| CTX-02 | Phase 2 | Pending |
+| CTX-03 | Phase 2 | Pending |
+| CTX-04 | Phase 2 | Pending |
+| CTX-05 | Phase 2 | Pending |
+| CTX-06 | Phase 2 | Pending |
+| CTX-07 | Phase 2 | Pending |
+| CTX-08 | Phase 2 | Pending |
+| OUT-01 | Phase 2 | Pending |
+| OUT-02 | Phase 2 | Pending |
+| OUT-03 | Phase 2 | Pending |
+| OUT-04 | Phase 2 | Pending |
+| REV-02 | Phase 2 | Pending |
+| REV-03 | Phase 2 | Pending |
+| REV-04 | Phase 2 | Pending |
+| DEL-01 | Phase 3 | Pending |
+| DEL-02 | Phase 3 | Pending |
+| DEL-03 | Phase 3 | Pending |
+| DEL-04 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 28 total
-- Mapped to phases: 0
-- Unmapped: 28 ⚠️
+- Mapped to phases: 28
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-05*
-*Last updated: 2026-04-05 after initial definition*
+*Last updated: 2026-04-05 after roadmap phase mapping*
