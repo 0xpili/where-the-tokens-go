@@ -1,0 +1,186 @@
+{
+  "metadata": {
+    "date": "2026-04-06T01:16:12.466209+00:00",
+    "model": "claude-sonnet-4-6",
+    "repeat_count": 1,
+    "script_version": "1.0",
+    "source": "estimated (ANTHROPIC_API_KEY not set)"
+  },
+  "components": {
+    "empty_baseline": {
+      "mean": 29,
+      "min": 29,
+      "max": 29,
+      "stdev": 0.0,
+      "measurements": [
+        29
+      ],
+      "_estimated": true
+    },
+    "system_prompt": {
+      "mean": 3200,
+      "min": 3200,
+      "max": 3200,
+      "stdev": 0.0,
+      "measurements": [
+        3200
+      ],
+      "_estimated": true
+    },
+    "all_tools": {
+      "mean": 15500,
+      "min": 15500,
+      "max": 15500,
+      "stdev": 0.0,
+      "measurements": [
+        15500
+      ],
+      "_estimated": true
+    },
+    "tool_Read": {
+      "mean": 2400,
+      "min": 2400,
+      "max": 2400,
+      "stdev": 0.0,
+      "measurements": [
+        2400
+      ],
+      "_estimated": true
+    },
+    "tool_Write": {
+      "mean": 1800,
+      "min": 1800,
+      "max": 1800,
+      "stdev": 0.0,
+      "measurements": [
+        1800
+      ],
+      "_estimated": true
+    },
+    "tool_Edit": {
+      "mean": 2100,
+      "min": 2100,
+      "max": 2100,
+      "stdev": 0.0,
+      "measurements": [
+        2100
+      ],
+      "_estimated": true
+    },
+    "tool_Bash": {
+      "mean": 1700,
+      "min": 1700,
+      "max": 1700,
+      "stdev": 0.0,
+      "measurements": [
+        1700
+      ],
+      "_estimated": true
+    },
+    "tool_Grep": {
+      "mean": 2000,
+      "min": 2000,
+      "max": 2000,
+      "stdev": 0.0,
+      "measurements": [
+        2000
+      ],
+      "_estimated": true
+    },
+    "tool_Glob": {
+      "mean": 1500,
+      "min": 1500,
+      "max": 1500,
+      "stdev": 0.0,
+      "measurements": [
+        1500
+      ],
+      "_estimated": true
+    },
+    "tool_Agent": {
+      "mean": 1600,
+      "min": 1600,
+      "max": 1600,
+      "stdev": 0.0,
+      "measurements": [
+        1600
+      ],
+      "_estimated": true
+    },
+    "claude_md_small": {
+      "mean": 45,
+      "min": 45,
+      "max": 45,
+      "stdev": 0.0,
+      "measurements": [
+        45
+      ],
+      "_estimated": true
+    },
+    "claude_md_medium": {
+      "mean": 220,
+      "min": 220,
+      "max": 220,
+      "stdev": 0.0,
+      "measurements": [
+        220
+      ],
+      "_estimated": true
+    },
+    "claude_md_large": {
+      "mean": 870,
+      "min": 870,
+      "max": 870,
+      "stdev": 0.0,
+      "measurements": [
+        870
+      ],
+      "_estimated": true
+    },
+    "memory_md": {
+      "mean": 150,
+      "min": 150,
+      "max": 150,
+      "stdev": 0.0,
+      "measurements": [
+        150
+      ],
+      "_estimated": true
+    },
+    "mcp_1server_3tools": {
+      "mean": 900,
+      "min": 900,
+      "max": 900,
+      "stdev": 0.0,
+      "measurements": [
+        900
+      ],
+      "_estimated": true
+    },
+    "mcp_3servers_10tools": {
+      "mean": 2800,
+      "min": 2800,
+      "max": 2800,
+      "stdev": 0.0,
+      "measurements": [
+        2800
+      ],
+      "_estimated": true
+    },
+    "environment_info": {
+      "mean": 60,
+      "min": 60,
+      "max": 60,
+      "stdev": 0.0,
+      "measurements": [
+        60
+      ],
+      "_estimated": true
+    }
+  },
+  "total_typical_overhead": {
+    "mean": 18920,
+    "description": "system_prompt + all_tools + medium_claude_md (estimated)",
+    "_estimated": true
+  }
+}

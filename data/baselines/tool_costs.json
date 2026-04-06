@@ -1,0 +1,105 @@
+{
+  "metadata": {
+    "date": "2026-04-06T01:16:17.397059+00:00",
+    "model": "claude-sonnet-4-6",
+    "repeat_count": 1,
+    "source": "estimated (ANTHROPIC_API_KEY not set)"
+  },
+  "individual_tools": {
+    "Read": {
+      "schema_tokens": 2400,
+      "description_tokens": 720,
+      "mean": 2400,
+      "min": 2400,
+      "max": 2400,
+      "stdev": 0.0,
+      "measurements": [
+        2400
+      ],
+      "_estimated": true
+    },
+    "Write": {
+      "schema_tokens": 1800,
+      "description_tokens": 540,
+      "mean": 1800,
+      "min": 1800,
+      "max": 1800,
+      "stdev": 0.0,
+      "measurements": [
+        1800
+      ],
+      "_estimated": true
+    },
+    "Edit": {
+      "schema_tokens": 2100,
+      "description_tokens": 630,
+      "mean": 2100,
+      "min": 2100,
+      "max": 2100,
+      "stdev": 0.0,
+      "measurements": [
+        2100
+      ],
+      "_estimated": true
+    },
+    "Bash": {
+      "schema_tokens": 1700,
+      "description_tokens": 510,
+      "mean": 1700,
+      "min": 1700,
+      "max": 1700,
+      "stdev": 0.0,
+      "measurements": [
+        1700
+      ],
+      "_estimated": true
+    },
+    "Grep": {
+      "schema_tokens": 2000,
+      "description_tokens": 600,
+      "mean": 2000,
+      "min": 2000,
+      "max": 2000,
+      "stdev": 0.0,
+      "measurements": [
+        2000
+      ],
+      "_estimated": true
+    },
+    "Glob": {
+      "schema_tokens": 1500,
+      "description_tokens": 450,
+      "mean": 1500,
+      "min": 1500,
+      "max": 1500,
+      "stdev": 0.0,
+      "measurements": [
+        1500
+      ],
+      "_estimated": true
+    },
+    "Agent": {
+      "schema_tokens": 1600,
+      "description_tokens": 480,
+      "mean": 1600,
+      "min": 1600,
+      "max": 1600,
+      "stdev": 0.0,
+      "measurements": [
+        1600
+      ],
+      "_estimated": true
+    }
+  },
+  "cumulative_overhead": {
+    "0_tools": 0,
+    "1_tool": 2400,
+    "2_tools": 4500,
+    "3_tools": 6500,
+    "4_tools": 8300,
+    "5_tools": 10000,
+    "6_tools": 11600,
+    "7_tools": 13100,
+    "overhead_per_additional_tool": 1871
+  }
+}
