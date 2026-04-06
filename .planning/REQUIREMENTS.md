@@ -13,8 +13,8 @@
 - [ ] **MEAS-04**: Measure per-tool token cost (Read, Edit, Bash, Grep, Glob, Write, Agent) with controlled inputs
 - [x] **MEAS-05**: Use `/cost` and `/context` commands to validate measurements during live sessions
 - [x] **MEAS-06**: Set up ccusage for session-level aggregation (with documented accuracy caveats)
-- [ ] **MEAS-07**: Design before/after experiment methodology: identical tasks, different strategies, session-level totals compared
-- [ ] **MEAS-08**: Set up DuckDB for cross-session statistical analysis of token consumption patterns
+- [x] **MEAS-07**: Design before/after experiment methodology: identical tasks, different strategies, session-level totals compared
+- [x] **MEAS-08**: Set up DuckDB for cross-session statistical analysis of token consumption patterns
 
 ### Context Management
 
@@ -81,8 +81,8 @@
 | MEAS-04 | Phase 1 | Pending |
 | MEAS-05 | Phase 1 | Complete |
 | MEAS-06 | Phase 1 | Complete |
-| MEAS-07 | Phase 1 | Pending |
-| MEAS-08 | Phase 1 | Pending |
+| MEAS-07 | Phase 1 | Complete |
+| MEAS-08 | Phase 1 | Complete |
 | REV-01 | Phase 1 | Pending |
 | CTX-01 | Phase 2 | Pending |
 | CTX-02 | Phase 2 | Pending |

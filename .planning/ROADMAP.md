@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 01-01-PLAN.md — Measurement instrument pipeline (count_tokens wrapper, statusbar capture hook, ccusage validation, environment setup)
 - [ ] 01-02-PLAN.md — Baseline overhead measurements and system prompt mapping (component-level token counts, per-tool costs, baseline report)
-- [ ] 01-03-PLAN.md — Experiment methodology and DuckDB analysis infrastructure (schema, import pipeline, experiment template, SQL queries)
+- [x] 01-03-PLAN.md — Experiment methodology and DuckDB analysis infrastructure (schema, import pipeline, experiment template, SQL queries)
 
 ### Phase 2: Controlled Experiments
 **Goal**: Every proposed token optimization technique has been tested with controlled experiments producing measured before/after results
