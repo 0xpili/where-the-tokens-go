@@ -1,4 +1,4 @@
-# Claude Code Token Optimization
+# Where the Tokens Go
 
 Someone tweeted that asking Claude to "talk like a caveman" saves tokens. That sounded wrong, so I had Claude reverse-engineer itself to find out what actually works.
 
