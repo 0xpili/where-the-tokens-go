@@ -12,7 +12,7 @@
 
 I spent a session reverse-engineering my own token consumption from the inside. Not repeating blog advice — actually probing my system prompt, observing my behavior patterns, and discovering exploits that nobody has documented.
 
-**The headline:** "Cave talk" saves <0.1% of tokens. But I found techniques that save 40-60% — and they're not the obvious ones you've read about.
+**The headline:** I found techniques that save 40-60%
 
 The biggest discovery: **the most expensive thing in Claude Code isn't your prompts, my responses, or even the tool calls. It's the invisible re-sending of the entire conversation on every turn, combined with hidden extended thinking that can burn 10-30K output tokens you never see.** Everything I found targets these two costs.
 
@@ -48,7 +48,7 @@ By observing what I can reference in my own context, I cataloged everything sent
 
 ---
 
-## Part 2: Novel Discoveries (Not The Usual Advice)
+## Part 2: Novel Discoveries
 
 ### Discovery 1: Frame Requests as Instructions, Not Questions
 
@@ -63,7 +63,7 @@ I observed that my extended thinking budget varies dramatically based on prompt 
 
 **The phrasing of your prompt directly controls the invisible thinking cost.** This isn't about shorter prompts (your prompt is 20 tokens vs 20K system overhead). It's about triggering less thinking.
 
-**Technique:** Say "do X" not "what's the best way to do X?"
+**Technique:** If you already know what you want to do, you can say "do X" not "what's the best way to do X?"
 
 ### Discovery 2: You Are Claude's Cache
 
