@@ -28,12 +28,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Baseline overhead is measured and documented: system prompt, tool schemas, CLAUDE.md, memory, and MCP components each have a token count
   4. A before/after experiment template exists that controls for variables and produces comparable session-level totals
   5. Session data can be aggregated and queried in DuckDB for cross-session statistical analysis
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
-- [ ] 01-03: TBD
+- [ ] 01-01-PLAN.md — Measurement instrument pipeline (count_tokens wrapper, statusbar capture hook, ccusage validation, environment setup)
+- [ ] 01-02-PLAN.md — Baseline overhead measurements and system prompt mapping (component-level token counts, per-tool costs, baseline report)
+- [ ] 01-03-PLAN.md — Experiment methodology and DuckDB analysis infrastructure (schema, import pipeline, experiment template, SQL queries)
 
 ### Phase 2: Controlled Experiments
 **Goal**: Every proposed token optimization technique has been tested with controlled experiments producing measured before/after results
@@ -75,6 +75,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Measurement Foundation | 0/3 | Not started | - |
+| 1. Measurement Foundation | 0/3 | Planned | - |
 | 2. Controlled Experiments | 0/3 | Not started | - |
 | 3. Synthesis & Deliverables | 0/2 | Not started | - |
