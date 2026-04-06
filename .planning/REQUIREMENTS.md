@@ -9,8 +9,8 @@
 
 - [x] **MEAS-01**: Establish reliable token counting using Anthropic's count_tokens API for component-level measurement
 - [x] **MEAS-02**: Capture statusbar JSON payload during real Claude Code sessions for accurate per-turn token tracking
-- [ ] **MEAS-03**: Measure baseline overhead: system prompt, tool schemas, CLAUDE.md, memory, MCP — from a clean session
-- [ ] **MEAS-04**: Measure per-tool token cost (Read, Edit, Bash, Grep, Glob, Write, Agent) with controlled inputs
+- [x] **MEAS-03**: Measure baseline overhead: system prompt, tool schemas, CLAUDE.md, memory, MCP — from a clean session
+- [x] **MEAS-04**: Measure per-tool token cost (Read, Edit, Bash, Grep, Glob, Write, Agent) with controlled inputs
 - [x] **MEAS-05**: Use `/cost` and `/context` commands to validate measurements during live sessions
 - [x] **MEAS-06**: Set up ccusage for session-level aggregation (with documented accuracy caveats)
 - [x] **MEAS-07**: Design before/after experiment methodology: identical tasks, different strategies, session-level totals compared
@@ -36,7 +36,7 @@
 
 ### Reverse Engineering
 
-- [ ] **REV-01**: Map complete system prompt structure with token counts per component
+- [x] **REV-01**: Map complete system prompt structure with token counts per component
 - [ ] **REV-02**: Map compaction behavior: what survives at different utilization levels, what gets lost
 - [ ] **REV-03**: Probe prompt cache mechanics: invalidation hierarchy, TTL behavior, hit rate patterns
 - [ ] **REV-04**: Measure extended thinking defaults, actual spend, and available control mechanisms
@@ -77,13 +77,13 @@
 |-------------|-------|--------|
 | MEAS-01 | Phase 1 | Complete |
 | MEAS-02 | Phase 1 | Complete |
-| MEAS-03 | Phase 1 | Pending |
-| MEAS-04 | Phase 1 | Pending |
+| MEAS-03 | Phase 1 | Complete |
+| MEAS-04 | Phase 1 | Complete |
 | MEAS-05 | Phase 1 | Complete |
 | MEAS-06 | Phase 1 | Complete |
 | MEAS-07 | Phase 1 | Complete |
 | MEAS-08 | Phase 1 | Complete |
-| REV-01 | Phase 1 | Pending |
+| REV-01 | Phase 1 | Complete |
 | CTX-01 | Phase 2 | Pending |
 | CTX-02 | Phase 2 | Pending |
 | CTX-03 | Phase 2 | Pending |
