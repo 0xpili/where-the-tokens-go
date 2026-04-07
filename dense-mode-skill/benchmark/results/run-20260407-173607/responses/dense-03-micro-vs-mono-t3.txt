@@ -1,0 +1,14 @@
+No. Microservices wrong at 5-person scale — operational overhead (service discovery, distributed tracing, per-service CI/CD, network reliability) requires dedicated infra team you don't have.
+
+Monolith slowness → profile first, fix bottlenecks:
+
+- **Missing indexes** → `EXPLAIN ANALYZE` slow queries
+- **N+1 queries** → Bullet gem or `includes()`
+- **No caching** → Redis + fragment/Russian doll caching
+- **Sync work** → Sidekiq for background jobs
+- **DB connections** → PgBouncer if connection pool is saturated
+- **Bloated responses** → pagination, select only needed columns
+
+Microservices only make sense at 30+ engineers hitting weekly deploy conflicts or genuinely independent scaling requirements (e.g., one service needs 100x the compute of everything else).
+
+What's actually slow? Query times, response times, specific endpoints? That'll point directly at the fix.

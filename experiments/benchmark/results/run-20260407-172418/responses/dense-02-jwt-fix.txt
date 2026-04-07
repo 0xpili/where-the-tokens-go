@@ -1,0 +1,8 @@
+I only have Figma MCP tools available in this session — no filesystem tools to explore the codebase directly. To write a useful plan, I need a bit more context.
+
+Can you share:
+1. **Which file(s)** contain the JWT middleware and token creation logic?
+2. **What language/framework** are you using (Node.js/Express, Python/FastAPI, Go, etc.)?
+3. **How is `exp` set** when creating the token — is it using `Date.now()`, `time.time()`, or similar?
+
+Based on the symptoms (token created 2s ago → immediately "expired"), the likely cause is **clock skew** — the validator's clock is ahead of the issuer's, or `exp` is being set in milliseconds instead of seconds (a common JS mistake where `Date.now()` returns ms but JWT expects seconds). But I want to confirm before planning the fix.

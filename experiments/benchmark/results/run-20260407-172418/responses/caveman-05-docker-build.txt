@@ -1,0 +1,48 @@
+File system tools aren't available in this context, so I'll present the plan inline.
+
+---
+
+## Plan: Multi-stage Node.js Dockerfile
+
+### What I'll create
+1. **`Dockerfile`** — 3-stage build
+2. **`.dockerignore`** — prevent local artifacts inflating build context
+
+### Stage breakdown
+
+| Stage | Base | Purpose |
+|---|---|---|
+| `deps` | `node:22-alpine` | Install **prod-only** deps with `npm ci --omit=dev` |
+| `builder` | `node:22-alpine` | Install all deps, copy source, run `npm run build` |
+| `production` | `node:22-alpine` | Copy compiled output + prod `node_modules` only |
+
+### Size-reduction techniques
+- **Alpine** base (~5 MB vs ~200 MB Debian)
+- `--omit=dev` strips devDependencies from final image
+- `npm ci` (not `npm install`) — faster, reproducible
+- Source code excluded from final image (compiled output only)
+- `package*.json` copied before source for better layer caching
+- Non-root `node` user (security + smaller effective surface)
+- `.dockerignore` excludes `node_modules/`, `.git/`, test files, `*.md`
+
+### Dockerfile structure
+```
+FROM node:22-alpine AS deps        # prod deps only
+FROM node:22-alpine AS builder     # full build
+FROM node:22-alpine AS production  # lean runtime
+  COPY --from=deps /app/node_modules
+  COPY --from=builder /app/dist
+  USER node
+  CMD ["node", "dist/index.js"]
+```
+
+### Verification
+```bash
+docker build -t my-api .
+docker images my-api       # typical result: ~120-180 MB
+docker run -p 3000:3000 my-api
+```
+
+---
+
+Ready to generate the files. Should I proceed, and does this target a TypeScript project (needs `tsc`/build step) or plain JS (skip `builder` stage, simplify to 2 stages)?

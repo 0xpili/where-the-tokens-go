@@ -1,0 +1,22 @@
+Shared state update upstream. When you click the button:
+
+- Button → updates shared state (parent, Context, Redux/Zustand store, etc.)
+- React re-renders all components subscribed to that state
+- Your unrelated component is downstream of that state → gets re-rendered
+
+**Most common causes:**
+
+1. **Context** — your component consumes a Context whose value changes when the button fires
+2. **Parent re-render** — a common ancestor holds the state; all children re-render by default
+3. **Global store** — component selects from a store slice that changes
+
+**Fixes by cause:**
+
+| Cause | Fix |
+|---|---|
+| Context | Split context into smaller pieces, or use `useMemo` on the value |
+| Parent re-render | Wrap child in `React.memo()` |
+| Store (Redux) | Use granular selectors so component only subscribes to its slice |
+| Store (Zustand) | Pass a selector: `useStore(state => state.specificField)` |
+
+**Quick diagnosis:** Add `console.log('rendered')` to the component, click the button, then check React DevTools Profiler → "Why did this render?" — it will name the exact prop or state that changed.

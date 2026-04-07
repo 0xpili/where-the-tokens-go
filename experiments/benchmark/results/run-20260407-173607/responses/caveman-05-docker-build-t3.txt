@@ -1,0 +1,76 @@
+I don't have a file-writing tool available in this environment. Here's the plan:
+
+---
+
+## Plan: Multi-stage Dockerfile for Node.js API
+
+**Three stages:**
+1. **deps** — `npm ci --omit=dev` to install only production dependencies
+2. **build** — install all deps + compile TypeScript / run build step  
+3. **production** — copy compiled output + prod `node_modules` into a minimal base
+
+**Final base:** `node:22-alpine` (~50MB vs ~350MB for full Debian node)
+
+**Dockerfile:**
+```dockerfile
+# Stage 1: production deps only
+FROM node:22-alpine AS deps
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+# Stage 2: build (compile TS, bundle, etc.)
+FROM node:22-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Stage 3: minimal production image
+FROM node:22-alpine AS production
+ENV NODE_ENV=production
+WORKDIR /app
+
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+COPY package*.json ./
+
+USER appuser
+EXPOSE 3000
+CMD ["node", "dist/index.js"]
+```
+
+**.dockerignore:**
+```
+node_modules
+dist
+.git
+*.log
+.env*
+coverage
+```
+
+**Key decisions:**
+
+| Choice | Reason |
+|---|---|
+| `node:22-alpine` | ~50MB vs ~350MB full Debian |
+| `npm ci` not `npm install` | deterministic, no lockfile mutation |
+| Separate deps + build stages | build cache: code change only invalidates build stage, not deps install |
+| Non-root user | least-privilege security |
+| `.dockerignore` | prevents secret leaks, shrinks build context |
+
+**Verification:**
+```bash
+docker build -t myapi .
+docker images myapi          # inspect final size
+docker run --rm -p 3000:3000 myapi
+curl http://localhost:3000/health
+```
+
+Two questions before I write the files:
+1. Is this a TypeScript project? If pure JS, the build stage can be simplified (or dropped).
+2. Is there an existing `package.json` / project structure I should adapt to, or is this a greenfield template?

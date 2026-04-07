@@ -1,0 +1,43 @@
+I don't have file-reading or writing tools available in this context — only Figma MCP tools. I can't explore the codebase or write the plan file as required.
+
+That said, the symptom is distinctive enough to diagnose without reading code. Here are the root causes ranked by likelihood:
+
+---
+
+**#1 — Milliseconds vs seconds (most common)**
+
+JWT `exp` must be Unix *seconds*, not milliseconds.
+
+```js
+// BAD — 13-digit ms timestamp, validator sees year 2525
+exp: Date.now() + 3600000
+
+// GOOD
+exp: Math.floor(Date.now() / 1000) + 3600
+```
+
+**#2 — `exp` set to duration, not absolute time**
+
+```js
+// BAD — means "epoch + 1 hour" = Jan 1970, always expired
+exp: 3600
+
+// GOOD
+exp: Math.floor(Date.now() / 1000) + 3600
+```
+
+**#3 — Clock skew between servers**
+
+If token creation and validation run on different machines, a clock difference of a few seconds triggers false expiry. Add leeway:
+
+```js
+jwt.verify(token, secret, { clockTolerance: 30 }) // jsonwebtoken
+```
+
+Run `date` on both servers — they should match within ~1s.
+
+---
+
+**Quick sanity check**: base64-decode the middle segment of the token and inspect `iat` and `exp`. `exp` should be a 10-digit number (e.g. `1712500000`) and `exp - iat` should equal your intended TTL in seconds. If `exp` is 13 digits, it's the ms bug.
+
+Can you share the token creation code? That would confirm which one it is.

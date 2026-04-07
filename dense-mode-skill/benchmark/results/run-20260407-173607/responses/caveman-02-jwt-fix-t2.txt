@@ -1,0 +1,12 @@
+I don't have filesystem tools available to search the codebase directly. I need you to share the relevant code.
+
+Could you paste or point me to:
+1. The JWT creation code (where `exp` is set)
+2. The middleware validation code
+
+The "just created but already expired" pattern almost always points to one of these root causes:
+- **Clock skew** between token-issuing and token-validating services
+- **Milliseconds vs seconds** for the `exp` claim (`Date.now()` gives ms; JWT `exp` expects Unix seconds)
+- **Subtraction instead of addition** when computing expiry (`now - ttl` instead of `now + ttl`)
+
+Share the code and I can pinpoint it.

@@ -1,0 +1,42 @@
+The Figma tool call was a mistake — I don't have filesystem tools in this environment to check for an existing Node.js project. Since the request is for a general-purpose template (no project files to read), I'll proceed directly to planning.
+
+---
+
+## Plan: Multi-stage Dockerfile for Node.js API
+
+**Goal:** Produce a Dockerfile with two stages — a build stage and a lean production stage — minimizing the final image size by excluding dev dependencies, build tooling, and source files.
+
+### Stage breakdown
+
+**Stage 1 — `builder`**
+- Base: `node:22-alpine`
+- Copy `package*.json`, run `npm ci` (all deps including devDeps)
+- Copy source, run `npm run build` (compiles TypeScript → `dist/`)
+
+**Stage 2 — `runner`** (final image)
+- Base: `node:22-alpine` (same to reuse layer cache)
+- Set `NODE_ENV=production`
+- Copy `package*.json`, run `npm ci --omit=dev` (production deps only)
+- Copy only `dist/` from builder stage
+- Drop to non-root user (`node`) for security
+- `CMD ["node", "dist/index.js"]`
+
+### Also needed: `.dockerignore`
+Excludes `node_modules`, `.git`, `*.ts` source, test files — prevents accidental copies inflating the final image.
+
+### Key size levers
+| Technique | Impact |
+|---|---|
+| Alpine base | ~100 MB vs ~300 MB for full Debian |
+| `--omit=dev` in final stage | Drops devDeps (often >50% of `node_modules`) |
+| Copy only `dist/` from builder | No TypeScript source, no test files |
+| Non-root `node` user | Security, no size cost |
+| `npm ci` not `npm install` | Reproducible builds, avoids lock drift |
+
+### Files to create
+- `Dockerfile` — two-stage build
+- `.dockerignore` — excludes noise from build context
+
+Since I can't write to the plan file (no filesystem tools available in this session), here is the final plan as stated above. The implementation is self-contained — just two new files with no existing code to modify.
+
+Ready to implement? Approve and I'll generate both files.

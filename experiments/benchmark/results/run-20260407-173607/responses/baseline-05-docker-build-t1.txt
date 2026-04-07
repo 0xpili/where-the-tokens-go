@@ -1,0 +1,69 @@
+I don't have file system tools available in this session, so I'll present the plan as text and produce the Dockerfile directly.
+
+---
+
+## Multi-stage Dockerfile for a Node.js API
+
+**Strategy:** Three stages — `deps` (install production deps), `builder` (compile/build), `runtime` (minimal final image).
+
+Key choices to minimize image size:
+- Use `node:XX-alpine` (not `node:XX`) — saves ~200MB
+- Separate `devDependencies` from production install
+- Copy only the compiled output + `node_modules` to the final stage
+- Run as a non-root user
+
+```dockerfile
+# ── Stage 1: install ALL deps (including dev) ──────────────────────────────
+FROM node:22-alpine AS deps
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+
+# ── Stage 2: build ─────────────────────────────────────────────────────────
+FROM node:22-alpine AS builder
+
+WORKDIR /app
+
+# Bring in full node_modules from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Compile TypeScript (or whatever your build step is)
+RUN npm run build
+
+# Prune dev dependencies — leave only production ones
+RUN npm prune --omit=dev
+
+
+# ── Stage 3: minimal runtime image ─────────────────────────────────────────
+FROM node:22-alpine AS runtime
+
+ENV NODE_ENV=production
+
+WORKDIR /app
+
+# Non-root user for security
+RUN addgroup -S app && adduser -S app -G app
+
+# Copy only what the process needs to run
+COPY --from=builder --chown=app:app /app/dist       ./dist
+COPY --from=builder --chown=app:app /app/node_modules ./node_modules
+COPY --from=builder --chown=app:app /app/package.json ./
+
+USER app
+
+EXPOSE 3000
+
+CMD ["node", "dist/index.js"]
+```
+
+**Assumptions to verify against your project:**
+- Build output goes to `dist/` — adjust if it's `build/` or similar
+- Entry point is `dist/index.js` — adjust to match your `main` in `package.json`
+- Build script is `npm run build` — change if you use `tsc` directly, `esbuild`, etc.
+- If you have no build step (plain JS), collapse stages 2+3 and skip the `dist` copy
+
+**Expected final image size:** ~150–180MB vs ~1GB for a non-optimized image.

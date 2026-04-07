@@ -1,0 +1,24 @@
+Almost certainly not. For a 5-person team, microservices would slow you down more than your monolith does.
+
+**The real questions first:**
+
+- *What's actually slow?* Database queries? N+1s? Missing indexes? Background jobs blocking requests? Most Rails performance problems are fixable without rearchitecting.
+- *Slow for users, or slow to develop?* These have different fixes.
+
+**Why microservices would hurt you:**
+
+- Network calls, distributed transactions, service discovery, and deployment complexity all become your team's problems overnight.
+- You'd need infra/DevOps capacity you don't have at 5 people.
+- Debugging across services is much harder than debugging a monolith.
+
+**What actually works at your scale:**
+
+1. **Profile first** — `rack-mini-profiler`, `bullet` gem, slow query log. Find the actual bottleneck.
+2. **Database** — indexes, `includes` to kill N+1s, Postgres connection pooling (PgBouncer), read replicas if needed.
+3. **Background jobs** — move slow work to Sidekiq if you haven't.
+4. **Caching** — fragment caching, Redis for hot data.
+5. **Extract a service only if forced** — e.g., one domain has wildly different scaling needs (image processing, ML inference). Extract *that one thing*, keep the rest.
+
+**The rule:** Microservices solve *organizational* scaling (many teams needing independent deploys) more than *technical* scaling. At 5 people, you don't have that problem yet.
+
+Fix the slow parts of your monolith. You'll get 10x the benefit for 1/10th the cost.

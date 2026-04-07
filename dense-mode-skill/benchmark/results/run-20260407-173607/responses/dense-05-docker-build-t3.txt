@@ -1,0 +1,87 @@
+No file system tools are available in this context (only Figma/auth MCP tools). I'll document the plan inline and proceed to exit plan mode.
+
+---
+
+## Plan: Multi-stage Dockerfile for Node.js API
+
+**Context:** No existing Node.js project in the working directory — this is a general artifact request. Goal is a production-grade Dockerfile using multi-stage builds to minimize final image size.
+
+### Strategy
+
+| Stage | Base | Purpose |
+|---|---|---|
+| `deps` | `node:20-alpine` | Install production deps only |
+| `build` | `node:20-alpine` | Install all deps + compile TypeScript / run build |
+| `production` | `node:20-alpine` | Copy only built output + prod deps |
+
+**Size levers:**
+- Alpine base (~5MB vs ~300MB Debian)
+- Separate build stage so `devDependencies` and compiler toolchain never ship
+- `npm ci --omit=dev` in final stage (or copy `node_modules` from `deps` stage)
+- `.dockerignore` to exclude `node_modules`, `.git`, test files, docs
+- Run as non-root user
+- `NODE_ENV=production` to disable dev-only code paths
+
+### Final Dockerfile
+
+```dockerfile
+# syntax=docker/dockerfile:1
+
+# ── Stage 1: install production deps ────────────────────────────────────────
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts
+
+# ── Stage 2: build ──────────────────────────────────────────────────────────
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci                           # includes devDependencies
+COPY . .
+RUN npm run build                    # tsc, esbuild, etc.
+
+# ── Stage 3: production image ────────────────────────────────────────────────
+FROM node:20-alpine AS production
+ENV NODE_ENV=production
+WORKDIR /app
+
+# Non-root user (Alpine ships with 'node' user at uid 1000)
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Copy only what's needed at runtime
+COPY --from=deps    /app/node_modules ./node_modules
+COPY --from=build   /app/dist         ./dist
+COPY package.json ./
+
+USER appuser
+EXPOSE 3000
+
+CMD ["node", "dist/index.js"]
+```
+
+### Companion `.dockerignore`
+
+```
+node_modules
+dist
+.git
+.env*
+*.log
+coverage
+test
+docs
+README.md
+```
+
+### Verification
+1. `docker build -t api:test .` — should complete without errors
+2. `docker images api:test` — confirm size (target: <150MB for typical API)
+3. `docker run --rm -p 3000:3000 api:test` — confirm server starts
+4. `docker run --rm api:test whoami` — confirm output is `appuser`, not `root`
+5. `docker run --rm api:test sh -c "ls node_modules | wc -l"` — confirm no devDeps
+
+### Adjustments for common variations
+- **No build step** (plain JS): drop `build` stage, copy `src` directly into `production`
+- **Native addons** (`bcrypt`, `sharp`): add `build-base python3` to `deps` stage; keep them in final image
+- **Monorepo**: add `COPY turbo.json ./` and prune with `turbo prune` before `npm ci`

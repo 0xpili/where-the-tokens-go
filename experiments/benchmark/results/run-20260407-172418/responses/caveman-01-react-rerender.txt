@@ -1,0 +1,25 @@
+Shared state. When state lives in a common ancestor, any update to it re-renders the whole subtree — including your component — even if it doesn't use that state.
+
+**Common causes:**
+
+1. **State too high up** — state is in a parent/root component that both components are children of
+2. **Context** — your component consumes a context that updates when the button is clicked
+3. **Global state** (Redux, Zustand, etc.) — selector isn't specific enough, so your component subscribes to changes it doesn't care about
+
+**How to diagnose:**
+
+Add this temporarily to your component:
+```jsx
+console.log('re-rendered', new Date().toISOString())
+```
+
+Then use React DevTools Profiler to see *why* it re-rendered (it'll say "parent re-rendered" or "context changed" or "props changed").
+
+**Fixes depending on cause:**
+
+- **State too high**: Move state down closer to where it's used, or split into separate state variables
+- **Context**: Split context into smaller pieces, or use `useMemo` on the value
+- **Redux/Zustand**: Make your selector more specific so it only subscribes to the slice you need
+- **Unnecessary**: Wrap with `React.memo()` if the component's props haven't changed and the re-render is wasted work
+
+The root fix is almost always **colocate state** — push state down to the lowest common ancestor that actually needs it.

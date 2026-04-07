@@ -1,0 +1,42 @@
+**SQL Injection (Critical)**
+`f'SELECT * FROM users WHERE username = "{username}"'` — attacker sends `" OR 1=1 --` → auth bypass, full DB read, potential DROP.
+```python
+# Fix
+user = db.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+```
+
+**Plaintext Passwords (Critical)**
+`user['password'] == password` → passwords stored/compared as plaintext. One DB leak exposes all credentials.
+```python
+# Fix — store with bcrypt at registration, verify at login
+from werkzeug.security import check_password_hash
+if user and check_password_hash(user['password'], password):
+```
+
+**Timing Attack (Medium)**
+`==` short-circuits on first mismatch → timing leaks char-by-char match count. bcrypt's `checkpw` is constant-time; resolves automatically with fix above.
+
+**Session Fixation (Medium)**
+No session regeneration on login → attacker who sets a known session ID before auth gets it elevated.
+```python
+session.clear()  # add before setting session['user_id']
+session['user_id'] = user['id']
+```
+
+**No Rate Limiting (Medium)**
+Endpoint accepts unlimited login attempts → brute force trivial.
+```python
+# Fix — Flask-Limiter
+@limiter.limit("5/minute")
+def login(): ...
+```
+
+**Missing CSRF Protection (Medium)**
+POST form with no CSRF token → cross-site request forgery possible. Use Flask-WTF or manual token validation.
+
+**KeyError on Missing Fields (Low)**
+`request.form['username']` raises 500 if field absent. Use `request.form.get('username', '')` and validate non-empty before querying.
+
+---
+
+Priority order: SQL injection → plaintext passwords → session fixation → rate limiting → CSRF → input validation.

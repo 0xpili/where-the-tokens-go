@@ -1,0 +1,17 @@
+No. At 5 people, microservices trade one problem (slowness) for many worse ones:
+
+- Distributed tracing, service discovery, per-service CI/CD, network latency between services, eventual consistency
+- Operational overhead that needs a dedicated infra engineer minimum
+- Deploy complexity multiplies: one deploy becomes N coordinated deploys
+
+**The slowness is almost certainly fixable in the monolith.** Profile first:
+
+1. **Database** — missing indexes, N+1 queries (`bullet` gem), unoptimized queries (`EXPLAIN ANALYZE`)
+2. **No caching** — add Redis, use fragment/Russian-doll caching for expensive views
+3. **Synchronous work** — move emails, reports, webhooks to background jobs (Sidekiq)
+4. **Memory bloat** — check for objects held in memory, large ActiveRecord result sets (use `find_each`, `pluck`)
+5. **Asset/frontend** — slow pages are often slow assets, not slow Rails
+
+Run `rack-mini-profiler` in production for 10 minutes and you'll see exactly where the time goes. It's almost never "the monolith architecture" — it's one or two specific queries or missing cache layers.
+
+Microservices become worth considering at ~30+ engineers when deploy conflicts between teams become the actual bottleneck, not performance.

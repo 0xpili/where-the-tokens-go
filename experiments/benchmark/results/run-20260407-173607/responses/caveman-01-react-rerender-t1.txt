@@ -1,0 +1,18 @@
+Shared state. If both components subscribe to the same state (context, Redux store, Zustand, etc.), any update to that state re-renders all subscribers — even ones that don't use the changed value.
+
+Common causes:
+
+1. **Context too broad** — component consumes a context object; button updates one field; whole object reference changes; all consumers re-render.
+
+2. **Parent re-renders** — button's click handler lives in a parent that also renders your component. Parent re-renders → children re-render by default.
+
+3. **Global store selector too loose** — selecting the whole store object instead of just the slice you need.
+
+**Fixes:**
+
+- Split context into smaller pieces, or use `useMemo` to stabilize the value
+- `React.memo` on your component to skip re-renders when its props haven't changed
+- Tighten store selectors — select `state.foo` not `state`
+- `useCallback` on handlers passed as props to prevent new references each render
+
+To diagnose: install [React DevTools](https://react.dev/learn/react-developer-tools), open the Profiler tab, click the button, and check what triggered the re-render.

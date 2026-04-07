@@ -1,0 +1,7 @@
+I don't have filesystem tools available in this environment — no Read, Grep, Glob, or Bash. I can't locate the `calculateDiscount` function, write the plan file, or run tests.
+
+Could you share:
+1. The file path where `calculateDiscount` lives, or paste the function here
+2. Where the tests are located
+
+That way I can at least design the refactor plan for you.

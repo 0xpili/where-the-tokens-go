@@ -1,0 +1,49 @@
+Several issues, ordered by severity:
+
+## Critical
+
+**1. SQL Injection**
+```python
+f'SELECT * FROM users WHERE username = "{username}"'
+```
+Input like `" OR "1"="1` bypasses authentication entirely. Use parameterized queries:
+```python
+db.execute('SELECT * FROM users WHERE username = ?', (username,))
+```
+
+**2. Plaintext password storage/comparison**
+```python
+user['password'] == password
+```
+Passwords must be hashed with a slow algorithm. Use `bcrypt` or `argon2`:
+```python
+bcrypt.checkpw(password.encode(), user['password_hash'])
+```
+
+## High
+
+**3. No brute force protection**
+No rate limiting or lockout. Add `flask-limiter` or similar on this endpoint.
+
+**4. Session fixation**
+The session ID isn't regenerated after login, allowing a session fixation attack. Call `session.clear()` or regenerate before setting `user_id`.
+
+**5. CSRF**
+No CSRF token validation on the POST. Use `flask-wtf` or equivalent.
+
+## Medium
+
+**6. Timing oracle (minor)**
+With plaintext passwords (once fixed with hashing), ensure you always call `checkpw` even when the user isn't found — otherwise response timing leaks whether a username exists:
+```python
+dummy_hash = b'$2b$12$...'  # pre-computed
+hash_to_check = user['password_hash'] if user else dummy_hash
+bcrypt.checkpw(password.encode(), hash_to_check)
+```
+
+**7. Missing field handling**
+`request.form['username']` raises a `400 KeyError` if the field is absent — use `.get()` and validate explicitly.
+
+---
+
+The SQL injection + plaintext password combination is catastrophic: one is exploitable immediately, the other means the entire credential database is compromised if the DB is ever accessed.

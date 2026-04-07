@@ -1,0 +1,34 @@
+No. Not yet, and probably not for the reasons you think.
+
+**The real question: why is it slow?**
+
+Before any architecture change, profile the monolith:
+- `rack-mini-profiler` + `bullet` gem to find N+1 queries
+- `pg_stat_statements` for slow queries
+- `skylight` or `Scout APM` for endpoint-level tracing
+
+90% of Rails slowness is database — missing indexes, N+1s, missing caching. These are hours to fix, not weeks.
+
+**What microservices actually cost a 5-person team:**
+
+- Each service needs its own deploy pipeline, logging, monitoring, auth
+- Network calls replace in-process calls — you trade milliseconds of query time for milliseconds of network latency + failure modes
+- Distributed transactions are hard. `begin...rescue` becomes saga patterns or eventual consistency
+- Your 5 engineers now maintain 10+ repos instead of 1
+
+**When microservices actually make sense:**
+
+- A specific component has wildly different scaling needs (e.g., image processing) — extract *that one thing*
+- You have team ownership boundaries (team A owns billing, team B owns search) — you don't yet
+- The monolith has a specific hot path that can't be optimized otherwise
+
+**What to do instead:**
+
+1. Profile first — find the actual bottleneck
+2. Add database indexes + fix N+1s
+3. Add Redis caching (`Rails.cache`) for expensive reads
+4. Add background jobs (`Sidekiq`) for slow synchronous work
+5. Scale the monolith horizontally (more Puma workers / more dynos) — cheap and fast
+6. If one thing is genuinely hot and isolated, extract *only that* as a service
+
+A monolith run well beats a microservices mess at any team size. At 5 people, premature decomposition is a startup killer.

@@ -1,0 +1,3 @@
+I don't have filesystem access tools available in this session (only Figma MCP tools are configured), so I can't search for `calculateDiscount` in the codebase.
+
+Could you share the file path where `calculateDiscount` lives, or paste the current implementation? That will let me plan the refactor properly.

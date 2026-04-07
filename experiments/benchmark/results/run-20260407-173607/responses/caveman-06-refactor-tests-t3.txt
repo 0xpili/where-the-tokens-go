@@ -1,0 +1,10 @@
+I don't have access to file system tools (Read, Grep, Bash, etc.) in this environment — only MCP tools are available, which are for Figma, Gmail, Calendar, and similar services.
+
+To refactor `calculateDiscount` and run tests, I'd need:
+- File read access to find the function
+- File write/edit access to modify it
+- Bash access to run tests
+
+**Options:**
+1. Are you running this in a standard Claude Code session (CLI or IDE extension)? The file tools should be available there.
+2. If you paste the current `calculateDiscount` function here, I can write the refactored version and you can apply it manually.

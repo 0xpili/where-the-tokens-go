@@ -1,0 +1,23 @@
+Writing the plan file directly.
+
+---
+
+**Plan: Multi-stage Dockerfile for a Node.js API**
+
+**Stages:**
+1. `deps` — install only production `node_modules` (`npm ci --omit=dev`)
+2. `build` — install all deps, compile TypeScript (`npm ci` + `npm run build`)
+3. `release` — copy `/dist` from build + `node_modules` from deps onto a fresh `node:22-alpine`
+
+**Key size-reduction techniques:**
+- Alpine base (`~50 MB` vs `~900 MB` for full Debian)
+- Separate `deps` stage avoids shipping devDependencies
+- No source files or build tooling in the final image
+- Non-root user (`node`) for security
+- `.dockerignore` excludes `node_modules`, `.git`, tests, etc.
+
+**Files to create:**
+- `Dockerfile`
+- `.dockerignore`
+
+No existing codebase to read — this is a generic best-practices artifact. Ready to generate both files.

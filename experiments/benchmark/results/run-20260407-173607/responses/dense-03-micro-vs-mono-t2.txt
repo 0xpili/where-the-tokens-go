@@ -1,0 +1,24 @@
+No. At 5 people, microservices would slow you down, not speed you up.
+
+**The operational overhead is brutal at your scale:**
+- Service discovery, network calls, distributed tracing
+- Per-service CI/CD, deployments, monitoring
+- Eventual consistency headaches where you had ACID transactions
+- Requires a dedicated infra person (or two) just to keep it running
+
+**The slowness is almost certainly fixable in your monolith.** Profile first:
+
+- **N+1 queries** — use `bullet` gem to detect, fix with eager loading
+- **Missing indexes** — `EXPLAIN ANALYZE` on slow queries
+- **No caching** — Redis + fragment/low-level caching
+- **Synchronous work** — move to background jobs (Sidekiq)
+- **Database bottleneck** — read replicas, connection pooling (PgBouncer)
+
+**When microservices actually make sense:**
+- 30+ engineers with weekly deploy conflicts
+- Genuinely independent scaling requirements (e.g., a video processing service that needs 10x the CPU of everything else)
+- Different release cadences across autonomous teams
+
+**The rule of thumb:** Extract a service only when the cost of staying together is higher than the cost of being apart. At 5 people, it almost never is.
+
+Start with `rack-mini-profiler` + `bullet` in development. You'll likely find the culprit in an afternoon.

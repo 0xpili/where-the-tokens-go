@@ -1,0 +1,7 @@
+I don't have file system tools (Read, Grep, Bash, etc.) available in this session — only Figma MCP tools are loaded. I can't locate the `calculateDiscount` function without being able to search the codebase.
+
+Could you share:
+1. The file path where `calculateDiscount` lives, or
+2. Paste the function and its test file directly?
+
+That way I can plan the refactor accurately.

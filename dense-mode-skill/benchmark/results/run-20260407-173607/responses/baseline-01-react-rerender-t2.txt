@@ -1,0 +1,17 @@
+Most likely cause: **shared state higher up the tree**. When the button's click handler updates state in a parent (or ancestor) component, React re-renders that parent and everything below it — including your unrelated component.
+
+Common culprits:
+
+1. **Context** — if both components consume the same context and the button updates it, every consumer re-renders.
+2. **Lifted state** — state lives in a common ancestor; updating it cascades down.
+3. **Global state store** — Redux/Zustand/etc. selector is too broad and returns a new reference on unrelated updates.
+4. **Parent re-render** — the parent holds state, and your component doesn't memoize, so it always re-renders with the parent.
+
+**How to diagnose:** Add `console.log('render')` in the component or use the React DevTools Profiler to see what triggered the render and which component in the tree owns the changing state.
+
+**Fixes depending on cause:**
+
+- **Context:** Split context into smaller pieces, or use `useMemo` to stabilize the value.
+- **Lifted state:** Move state down closer to where it's used, or wrap your component in `React.memo`.
+- `React.memo` only helps if props aren't changing — if a parent passes a new object/function literal on every render, also use `useMemo`/`useCallback` on those.
+- **Zustand/Redux:** Narrow your selector so it only subscribes to the slice of state it needs.

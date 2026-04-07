@@ -1,0 +1,30 @@
+The most common causes, in order of likelihood:
+
+**1. Shared state in a common ancestor**
+If both components share a parent that holds state, clicking the button updates the parent's state, which re-renders the parent, which re-renders all its children — including yours.
+
+**2. Context**
+If your component consumes a React context, any update to that context (even from a distant component) triggers a re-render of all consumers, even if the specific value your component uses didn't change.
+
+**3. Global state (Redux, Zustand, Jotai, etc.)**
+Selectors that aren't precise enough will re-render your component when unrelated slices of state change.
+
+**4. The parent re-renders and you're not memoized**
+Even if your component receives the same props, if the parent re-renders, so do you — unless you're wrapped in `React.memo`.
+
+---
+
+**How to diagnose:**
+
+1. Install [React DevTools](https://react.dev/learn/react-developer-tools) and use the **Profiler** tab → record → click the button → see exactly what re-rendered and **why** (it shows "props changed", "context changed", "parent re-rendered", etc.)
+
+2. Add `console.log('rendered')` in your component and check the call stack in the browser devtools to trace where the render originated.
+
+**Common fixes:**
+
+- Move state down closer to where it's actually needed
+- Split context into smaller contexts (or use a selector pattern)
+- Use `React.memo` on the component + `useCallback`/`useMemo` to stabilize props
+- For global state, use precise selectors (e.g., `useSelector(state => state.specific.value)`)
+
+If you share the relevant code I can give you a more specific diagnosis.

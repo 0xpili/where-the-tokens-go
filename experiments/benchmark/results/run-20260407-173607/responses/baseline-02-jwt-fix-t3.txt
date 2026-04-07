@@ -1,0 +1,12 @@
+I don't have filesystem access tools in this environment to explore the codebase directly. Could you share the relevant code?
+
+Specifically, I need to see:
+1. The JWT token creation code (where `exp` is set)
+2. The middleware that validates/decodes the token
+
+The "just created but already expired" symptom is almost always one of three things:
+- `exp` set in **milliseconds** instead of seconds (Unix timestamps in JWTs must be seconds)
+- **Clock skew** between the issuing server and validating server
+- `exp` calculated from a wrong base (e.g., `new Date()` object instead of Unix epoch seconds)
+
+Please paste those two code sections and I'll pinpoint the exact issue.

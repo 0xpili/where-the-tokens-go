@@ -1,0 +1,53 @@
+Several critical issues:
+
+**1. SQL Injection (critical)**
+```python
+# Attacker input: " OR "1"="1  → logs in as first user
+f'SELECT * FROM users WHERE username = "{username}"'
+```
+Use parameterized queries:
+```python
+db.execute('SELECT * FROM users WHERE username = ?', (username,))
+```
+
+**2. Plaintext password comparison (critical)**
+`user['password'] == password` means passwords are stored/compared as plaintext. Use a proper hash:
+```python
+import bcrypt
+if user and bcrypt.checkpw(password.encode(), user['password']):
+```
+
+**3. Timing attack on username enumeration**
+`if user and user['password'] == password` short-circuits — response is faster when username doesn't exist, leaking valid usernames. Always run the hash check regardless:
+```python
+stored_hash = user['password'] if user else DUMMY_HASH
+valid = bcrypt.checkpw(password.encode(), stored_hash) and user is not None
+```
+
+**4. No CSRF protection**
+Form POST with no CSRF token. Use Flask-WTF or validate `Origin`/`Referer` headers.
+
+**5. Session fixation**
+Regenerate session after login to prevent fixation attacks:
+```python
+session.clear()
+session['user_id'] = user['id']
+```
+
+**6. No rate limiting**
+No brute-force protection. Add Flask-Limiter:
+```python
+@limiter.limit("5/minute")
+def login(): ...
+```
+
+**Summary by severity:**
+
+| Issue | Severity |
+|---|---|
+| SQL injection | Critical |
+| Plaintext passwords | Critical |
+| No rate limiting | High |
+| Session fixation | High |
+| Timing attack | Medium |
+| No CSRF | Medium |

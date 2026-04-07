@@ -1,0 +1,3 @@
+I don't have standard file system tools available in this environment to search the codebase. I can see the working directory is `/Users/pili/tokens-experiment` (a tokens experiment project) and `/Users/pili/lending-qa` as an additional directory.
+
+Could you tell me where the `calculateDiscount` function lives? Which file and which project?

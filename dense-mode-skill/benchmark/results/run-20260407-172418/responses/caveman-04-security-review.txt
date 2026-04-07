@@ -1,0 +1,43 @@
+Critical issues, ranked by severity:
+
+**1. SQL Injection (Critical)**
+```python
+# Attacker input: " OR "1"="1
+f'SELECT * FROM users WHERE username = "{username}"'
+```
+Use parameterized queries:
+```python
+user = db.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+```
+
+**2. Plaintext password comparison (Critical)**
+`user['password'] == password` means passwords are stored in plaintext (or compared unhashed). Use `bcrypt`/`argon2`:
+```python
+import bcrypt
+if user and bcrypt.checkpw(password.encode(), user['password']):
+```
+
+**3. Session fixation (High)**
+Regenerate session after login so a pre-auth session ID can't be reused:
+```python
+session.clear()
+session['user_id'] = user['id']
+```
+
+**4. No CSRF protection (High)**
+POST form with no CSRF token — use Flask-WTF or manually validate `X-CSRFToken`.
+
+**5. No rate limiting (Medium)**
+Unlimited login attempts enable brute force. Add `flask-limiter`:
+```python
+@limiter.limit("5 per minute")
+def login(): ...
+```
+
+**6. KeyError on missing fields (Low)**
+`request.form['username']` raises 500 if field absent — leaks a stack trace. Use `.get()`:
+```python
+username = request.form.get('username', '')
+```
+
+Issues 1 and 2 are exploitable right now. Fix those first.

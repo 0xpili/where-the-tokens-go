@@ -1,0 +1,34 @@
+{
+  "prompts": [
+    {
+      "id": "01-react-rerender",
+      "type": "prose",
+      "prompt": "Why does my React component re-render when I click a button in a completely different component?"
+    },
+    {
+      "id": "02-jwt-fix",
+      "type": "code",
+      "prompt": "The JWT middleware is rejecting valid tokens. The error is 'token expired' but the token was just created 2 seconds ago."
+    },
+    {
+      "id": "03-micro-vs-mono",
+      "type": "prose",
+      "prompt": "We're a 5-person startup. Our Rails monolith is getting slow. Should we move to microservices?"
+    },
+    {
+      "id": "04-security-review",
+      "type": "mixed",
+      "prompt": "Review this authentication endpoint for security issues:\n```python\n@app.route('/login', methods=['POST'])\ndef login():\n    username = request.form['username']\n    password = request.form['password']\n    user = db.execute(f'SELECT * FROM users WHERE username = \"{username}\"').fetchone()\n    if user and user['password'] == password:\n        session['user_id'] = user['id']\n        return redirect('/dashboard')\n    return 'Invalid credentials', 401\n```"
+    },
+    {
+      "id": "05-docker-build",
+      "type": "code",
+      "prompt": "Write a multi-stage Dockerfile for a Node.js API that minimizes the final image size."
+    },
+    {
+      "id": "06-refactor-tests",
+      "type": "tool",
+      "prompt": "Refactor the calculateDiscount function to handle percentage and fixed discounts separately, then run the tests."
+    }
+  ]
+}

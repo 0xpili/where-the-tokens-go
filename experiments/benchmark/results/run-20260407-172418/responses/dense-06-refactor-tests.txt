@@ -1,0 +1,8 @@
+I don't have access to standard file system tools in this context (no Bash, Read, Grep, etc.) — only Figma MCP tools are available here. I can't explore your codebase or run tests.
+
+To proceed, you'd need to run this in a Claude Code session with full tool access (terminal, file read/write). You can:
+
+1. Open your project in the **Claude Code CLI**: `claude` from your project directory
+2. Or use the **VS Code/JetBrains extension** where file tools are available
+
+Once in a full Claude Code session, I can read `calculateDiscount`, plan the refactor, and run the tests.

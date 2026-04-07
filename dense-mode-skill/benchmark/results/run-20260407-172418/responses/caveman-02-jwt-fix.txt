@@ -1,0 +1,13 @@
+I don't have file system tools available in this session to explore the codebase directly. To diagnose the JWT issue, I need to see the relevant code.
+
+Can you share:
+1. The JWT middleware file (or its path)
+2. How the token is being created (the signing/generation code)
+
+The most common causes of "token expired" on a fresh token are:
+- **Clock skew**: server time is ahead, so `exp` is already in the past from the verifier's perspective
+- **Wrong unit**: expiry set in seconds but passed as milliseconds (or vice versa)
+- **`iat` vs `exp` bug**: token created with `exp = iat - N` instead of `iat + N`
+- **Timezone offset**: naive datetime used without UTC
+
+If you can paste the middleware and token creation code, I can pinpoint the exact line.

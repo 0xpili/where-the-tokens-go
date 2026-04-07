@@ -1,0 +1,10 @@
+I don't have file system access available in this session to explore the codebase directly. Can you share the relevant JWT middleware code, or point me to the file path(s) involved?
+
+In the meantime — "token expired" on a fresh token is almost always one of these causes:
+
+1. **Clock skew** — issuer and validator clocks differ; validator sees `exp` in the past
+2. **Milliseconds vs seconds** — `exp` set with `Date.now()` (ms) instead of `Math.floor(Date.now()/1000)` (s)
+3. **`iat` used as `exp`** — accidentally comparing issue time against itself
+4. **Wrong timezone** — clocks agree numerically but different TZ offsets
+
+Share the middleware code and I can pinpoint the exact cause.

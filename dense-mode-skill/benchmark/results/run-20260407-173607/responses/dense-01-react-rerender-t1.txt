@@ -1,0 +1,27 @@
+Shared state updated upstream. Button → parent/context/store change → React re-renders children.
+
+**Common causes:**
+
+- **Shared state in a parent** — both components share a common ancestor that holds state; button click updates it → parent re-renders → your component re-renders
+- **Context** — your component consumes a context value; button updates that context → all consumers re-render
+- **Global store** (Redux, Zustand, Jotai) — your component subscribes to a slice; button updates that slice (or same store)
+- **Object/array identity in props/context** — new `{}` or `[]` created on every parent render, even if values are equal → React sees a "new" prop
+
+**How to diagnose:**
+
+```jsx
+// Add to your component
+console.log("re-render", { props, relevantState });
+// Or use React DevTools Profiler → "Why did this render?"
+```
+
+**Fixes by cause:**
+
+| Cause | Fix |
+|---|---|
+| Parent state unrelated to you | Move state down closer to the button |
+| Context too broad | Split context, or use `useMemo` on the value |
+| Store subscription too broad | Select only the slice you need |
+| Prop identity | `React.memo` + `useMemo`/`useCallback` on the prop |
+
+The most common root cause: state lives too high in the tree. The fix is usually **colocating state** closer to where it's actually used, rather than wrapping things in `memo`.

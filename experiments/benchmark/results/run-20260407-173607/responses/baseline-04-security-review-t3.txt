@@ -1,0 +1,34 @@
+Several critical issues:
+
+**1. SQL Injection (Critical)**
+```python
+f'SELECT * FROM users WHERE username = "{username}"'
+```
+A username like `" OR "1"="1` bypasses authentication entirely. Use parameterized queries:
+```python
+db.execute('SELECT * FROM users WHERE username = ?', (username,))
+```
+
+**2. Plaintext password comparison (Critical)**
+```python
+user['password'] == password
+```
+Passwords must be hashed. Use `bcrypt` or `argon2`:
+```python
+bcrypt.checkpw(password.encode(), user['password'])
+```
+Also use a **constant-time comparison** to prevent timing attacks — `bcrypt.checkpw` handles this; plain `==` does not.
+
+**3. No rate limiting**
+No protection against brute-force. Add `flask-limiter` or similar.
+
+**4. Session fixation**
+The session isn't regenerated after login. An attacker who planted a session ID before login inherits the authenticated session. Call `session.clear()` or regenerate before setting `user_id`.
+
+**5. Missing CSRF protection**
+POST form with no CSRF token. Use `flask-wtf` or set `WTF_CSRF_ENABLED`.
+
+**6. KeyError on missing fields**
+`request.form['username']` raises an unhandled exception if the field is absent (leaks stack traces in debug mode). Use `request.form.get('username', '')`.
+
+**Priority order to fix:** SQL injection → password hashing → CSRF → rate limiting → session fixation → input safety.

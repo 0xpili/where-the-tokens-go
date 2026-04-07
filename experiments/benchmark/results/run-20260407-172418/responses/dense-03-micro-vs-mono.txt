@@ -1,0 +1,22 @@
+No. Microservices at 5-person scale is a step backward.
+
+**Operational overhead you're signing up for:**
+- Service discovery, API gateways, inter-service auth
+- Distributed tracing, per-service CI/CD, separate deploy pipelines
+- Network latency for every cross-service call
+- Data consistency across service boundaries (distributed transactions)
+- On-call complexity multiplies with each service
+
+**Profile your monolith first — slowness almost always has a boring cause:**
+- Missing DB indexes → `EXPLAIN ANALYZE` slow queries
+- N+1 queries → use `bullet` gem to surface them
+- No caching → Redis + fragment/action caching
+- Synchronous work that should be async → Sidekiq for background jobs
+- Unoptimized ActiveRecord → eager loading, `select` only needed columns
+
+**When microservices actually make sense:**
+- 30+ engineers with weekly deploy conflicts between teams
+- A specific component has wildly different scaling needs (e.g., a video processing service)
+- Hard compliance boundary requires data isolation
+
+At 5 people, the right call is: profile, fix bottlenecks, defer the split. Microservices require a dedicated infra function to run well — you don't have that yet, and the overhead will slow you down more than the monolith ever did.

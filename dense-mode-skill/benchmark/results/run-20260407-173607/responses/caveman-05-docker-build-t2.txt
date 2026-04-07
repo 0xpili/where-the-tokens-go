@@ -1,0 +1,38 @@
+I don't have filesystem tools visible in this context. Let me present the plan directly:
+
+---
+
+## Plan: Multi-stage Dockerfile for Node.js API
+
+**Two stages:**
+
+**Stage 1 — `builder`** (`node:20-alpine`)
+- Install all deps (`npm ci`)
+- Compile TypeScript → `dist/`
+
+**Stage 2 — `runner`** (`node:20-alpine`)  
+- `npm ci --omit=dev` (production deps only)
+- Copy `dist/` from builder
+- Run as non-root `node` user
+
+**Size reduction techniques:**
+1. Alpine base (~5 MB vs ~900 MB debian)
+2. Multi-stage excludes devDeps + build toolchain
+3. `--omit=dev` flag on final install
+4. `.dockerignore` excludes `node_modules`, `.git`, tests
+5. Non-root user
+
+**Output files:** `Dockerfile` + `.dockerignore`
+
+**Verification:**
+```sh
+docker build -t node-api .
+docker images node-api    # expect ~150–200 MB
+docker run --rm -p 3000:3000 node-api
+```
+
+---
+
+Ready to generate the files. Note: the Dockerfile assumes TypeScript (`npm run build` → `dist/`). If your project is plain JS, I'll adjust to skip the build step.
+
+Should I proceed, or do you want to adjust anything (plain JS vs TS, port, Node version)?

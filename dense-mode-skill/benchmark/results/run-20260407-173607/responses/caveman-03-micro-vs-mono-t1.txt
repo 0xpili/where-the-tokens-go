@@ -1,0 +1,25 @@
+No. Almost certainly not.
+
+**5 people is too small.** Microservices multiply operational complexity — you need service discovery, distributed tracing, inter-service auth, network failure handling, deployment orchestration (Kubernetes), and more. That's easily 1-2 engineers just keeping the plumbing running.
+
+**"Getting slow" is almost never a microservices problem.** It's usually:
+
+- Missing database indexes
+- N+1 queries (use `bullet` gem to find them)
+- No caching (Redis + `solid_cache` or `rails cache`)
+- Synchronous work that should be async (Sidekiq/Solid Queue)
+- No CDN for assets
+
+**What to actually do:**
+
+1. Profile first — `rack-mini-profiler` + `flamegraph` in dev, Skylight/Scout/Datadog in prod
+2. Fix the top 3 slow queries with indexes or eager loading
+3. Move slow work to background jobs
+4. Add caching at the right layer
+5. Vertical scale (bigger Heroku dyno / RDS instance) — cheap and immediate
+
+**If you genuinely outgrow the monolith** (unlikely at 5 people), the pragmatic path is: extract one high-load service, keep the rest as monolith. Not a full rewrite.
+
+The companies that succeed with microservices built them *after* understanding where their monolith's boundaries were — usually at 50+ engineers with dedicated platform teams.
+
+What does "getting slow" look like specifically? That'll point to the real fix.

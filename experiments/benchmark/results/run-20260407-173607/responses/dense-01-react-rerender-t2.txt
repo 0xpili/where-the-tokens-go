@@ -1,0 +1,33 @@
+Shared state update upstream. When any state changes, React re-renders the component that owns that state **and all its children**.
+
+Common causes:
+
+**1. State lives too high in the tree**
+```jsx
+// Parent owns state → both ButtonComponent and YourComponent re-render
+function App() {
+  const [count, setCount] = useState(0);
+  return <>
+    <ButtonComponent onClick={() => setCount(c => c + 1)} />
+    <YourComponent />  {/* re-renders even though it doesn't use count */}
+  </>;
+}
+```
+
+**2. Context updates**
+Any component consuming a context re-renders when that context value changes — even if it only uses a part of the value that didn't change.
+
+**3. Store subscriptions (Redux, Zustand, etc.)**
+If both components subscribe to the same store slice, a dispatch in one triggers a re-render in the other.
+
+---
+
+**Fixes, in order of preference:**
+
+- **Move state down** — keep state as close as possible to where it's used
+- `React.memo` — wrap `YourComponent` to skip re-renders if props didn't change
+- Split context — separate frequently-changing state into its own context
+- `useMemo` / `useCallback` — stabilize object/function props passed down
+- Selectors — if using a store, use `useSelector` with a specific selector so you only re-render on relevant changes
+
+The fastest diagnostic: React DevTools Profiler → record → click the button → check what re-rendered and why.

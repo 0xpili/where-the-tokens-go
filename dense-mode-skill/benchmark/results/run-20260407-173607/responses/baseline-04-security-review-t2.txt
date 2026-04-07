@@ -1,0 +1,56 @@
+Several issues, ordered by severity:
+
+**Critical**
+
+1. **SQL Injection** — Direct f-string interpolation allows full auth bypass:
+   ```
+   username: " OR "1"="1
+   ```
+   Fix: use parameterized queries.
+   ```python
+   user = db.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+   ```
+
+2. **Plaintext password comparison** — `user['password'] == password` means passwords are stored and compared in plaintext. Use `bcrypt` or `argon2`:
+   ```python
+   if user and bcrypt.check_password_hash(user['password'], password):
+   ```
+
+**High**
+
+3. **Timing attack** — Even with hashing, `==` comparison leaks timing info. `bcrypt.check_password_hash` handles this, but if you roll your own, use `hmac.compare_digest`.
+
+4. **No brute-force protection** — No rate limiting or lockout. Add `flask-limiter` or similar.
+
+**Medium**
+
+5. **No CSRF protection** — A POST login form is a CSRF target. Use `flask-wtf` or set `SameSite=Strict` on the session cookie.
+
+6. **Missing input validation** — `request.form['username']` raises `KeyError` (→ 400) on missing fields. Use `.get()` and validate:
+   ```python
+   username = request.form.get('username', '').strip()
+   if not username or not password:
+       return 'Missing credentials', 400
+   ```
+
+**Minimal fix**
+
+```python
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form.get('username', '').strip()
+    password = request.form.get('password', '')
+    if not username or not password:
+        return 'Invalid credentials', 401
+
+    user = db.execute(
+        'SELECT * FROM users WHERE username = ?', (username,)
+    ).fetchone()
+
+    if user and bcrypt.check_password_hash(user['password'], password):
+        session['user_id'] = user['id']
+        return redirect('/dashboard')
+    return 'Invalid credentials', 401
+```
+
+The SQL injection + plaintext passwords are the blockers — fix those first.

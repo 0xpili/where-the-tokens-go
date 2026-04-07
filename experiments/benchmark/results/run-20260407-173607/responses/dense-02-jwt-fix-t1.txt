@@ -1,0 +1,3 @@
+I don't have file system tools available in this context to explore the codebase. Let me ask for the details I need.
+
+What language/framework is this, and can you share the relevant JWT middleware code (or the file path)? That'll let me pinpoint whether this is clock skew, a milliseconds-vs-seconds `exp` bug, or something else.

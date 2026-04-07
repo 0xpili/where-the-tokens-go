@@ -1,0 +1,22 @@
+No. Almost certainly not.
+
+**The real question is: why is it slow?**
+
+Microservices solve organizational scaling problems (many teams, independent deployments). They don't solve performance problems — they typically *add* latency by turning in-process calls into network calls.
+
+For a 5-person startup, microservices would likely:
+- Add significant operational overhead (service discovery, distributed tracing, inter-service auth, deployment complexity)
+- Make debugging much harder (distributed failures are harder to reason about)
+- Slow down development (changes spanning services require coordinating deploys)
+
+**What actually fixes a slow Rails monolith:**
+
+1. **Database** — almost always the culprit. Add the `bullet` gem and fix N+1 queries. Add missing indexes (`rack-mini-profiler` or `explain` on slow queries).
+2. **Caching** — fragment caching, counter caches, memoization of expensive reads.
+3. **Background jobs** — move slow work out of the request cycle (Sidekiq).
+4. **DB connection pooling** — PgBouncer if you're exhausting connections.
+5. **Profiling** — `stackprof` or Skylight/Scout APM to find the actual hotspots before optimizing anything.
+
+**The only time microservices make sense at your stage:** one part of the system has genuinely different scaling characteristics (e.g., a video processing pipeline) and you've exhausted simpler options.
+
+What kind of slowness are you seeing — slow page loads, slow background jobs, database timeouts? That'll narrow it down fast.

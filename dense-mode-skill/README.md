@@ -31,9 +31,11 @@ npx skills add 0xpili/dense-mode
 >
 > Also check: `exp` in seconds not ms, timezone mismatch, cross-env tokens.
 
-## How it compares
+## Benchmarks
 
-Tested across 6 Claude Code tasks ([full research](https://github.com/0xpili/where-the-tokens-go/blob/master/research/13-dense-vs-cave-talk.md)):
+### Manual comparison (Experiment 13)
+
+Claude wrote the same 6 responses in each style, measured via word count × 1.3 ([full research](https://github.com/0xpili/where-the-tokens-go/blob/master/research/13-dense-vs-cave-talk.md)):
 
 | Metric | Normal | Cave Talk | Dense Mode |
 |--------|--------|-----------|------------|
@@ -43,6 +45,24 @@ Tested across 6 Claude Code tasks ([full research](https://github.com/0xpili/whe
 | 30-turn savings | — | 80K tokens | **88K tokens** |
 
 Dense mode beats cave talk by 5 percentage points with zero information loss.
+
+### Automated CLI benchmark
+
+Real `claude -p` runs with `--output-format json` measuring actual API token counts. 6 prompts × 3 configs × 3 trials (median), Sonnet model. See [`benchmark/`](benchmark/) for raw data and script.
+
+| Prompt | Type | Baseline | Caveman | Dense |
+|--------|------|----------|---------|-------|
+| React re-render | prose | 406 | 472 | 527 |
+| JWT middleware fix | code | 1,319 | 2,341 | 1,196 |
+| Microservices vs mono | prose | 610 | 523 | 392 |
+| Security review | mixed | 894 | 805 | 1,003 |
+| Docker multi-stage | code | 1,505 | 1,684 | 2,224 |
+| Refactor + tests | tool | 1,053 | 962 | 923 |
+| **Average** | | **964** | **1,131** | **1,044** |
+
+**Key finding:** In single-turn `claude -p` mode, neither skill consistently reduces output tokens. Extended thinking variance (visible via input token differences) suggests the model takes fundamentally different reasoning paths depending on the system prompt, making isolated single-turn benchmarks unreliable for measuring compression.
+
+Dense mode's value shows most clearly in **interactive sessions** where the compression pattern compounds across turns — not in cold single-turn calls where the model hasn't "warmed up" to the style.
 
 ## Why it works
 

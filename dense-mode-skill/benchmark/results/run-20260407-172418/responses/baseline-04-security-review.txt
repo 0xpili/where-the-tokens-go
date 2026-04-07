@@ -1,0 +1,39 @@
+Several critical issues:
+
+## 1. SQL Injection (Critical)
+```python
+db.execute(f'SELECT * FROM users WHERE username = "{username}"')
+```
+An attacker inputs `" OR "1"="1` to bypass auth entirely. Fix: use parameterized queries.
+```python
+db.execute('SELECT * FROM users WHERE username = ?', (username,))
+```
+
+## 2. Plaintext Password Comparison (Critical)
+```python
+user['password'] == password
+```
+Passwords must be hashed at rest. Use `bcrypt` or `argon2`:
+```python
+bcrypt.checkpw(password.encode(), user['password_hash'])
+```
+
+## 3. Timing Attack (High)
+`user['password'] == password` short-circuits — an attacker can distinguish "username not found" from "wrong password" via response time, enabling username enumeration. `bcrypt.checkpw` is constant-time and resolves this.
+
+## 4. No Rate Limiting (High)
+No protection against brute force. Add `flask-limiter` or similar:
+```python
+@limiter.limit("5 per minute")
+def login(): ...
+```
+
+## 5. No CSRF Protection (Medium)
+POST form with no CSRF token. Flask-WTF or manual token validation required.
+
+## 6. No Input Length Validation (Low)
+Unbounded `username`/`password` can be used for DoS or to probe behavior. Cap them early.
+
+---
+
+**Priority order:** SQL injection → plaintext passwords → rate limiting → timing/CSRF.

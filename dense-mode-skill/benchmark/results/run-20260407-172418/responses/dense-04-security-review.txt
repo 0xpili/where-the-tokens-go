@@ -1,0 +1,33 @@
+**SQL Injection (Critical)** — f-string interpolation → attacker sends `" OR "1"="1` → auth bypass, full table dump.
+```python
+# Vulnerable
+f'SELECT * FROM users WHERE username = "{username}"'
+
+# Fix
+db.execute('SELECT * FROM users WHERE username = ?', (username,))
+```
+
+**Plaintext passwords (Critical)** — direct `==` comparison means passwords stored unhashed. Single DB breach exposes all credentials.
+```python
+# Fix
+from werkzeug.security import check_password_hash
+if user and check_password_hash(user['password'], password):
+```
+
+**Timing attack (Medium)** — `==` short-circuits → response time leaks how many characters matched. Resolved automatically by switching to `check_password_hash()` (bcrypt is constant-time).
+
+**Session fixation (Medium)** — no session regeneration before privilege escalation. Attacker pre-sets a known session ID, then it gets promoted after login.
+```python
+session.clear()  # add before setting user_id
+session['user_id'] = user['id']
+```
+
+**Missing input validation (Low)** — `request.form['username']` raises `KeyError` if field absent → unhandled 500. Use `request.form.get('username', '')` + reject empty strings.
+
+**No rate limiting (Low)** — endpoint is open to brute force. Add Flask-Limiter: `@limiter.limit("5/minute")`.
+
+**`SELECT *` (Low)** — fetches password column into memory unnecessarily. Select only needed columns: `SELECT id, username, password`.
+
+---
+
+Priority order: SQL injection → plaintext passwords → session fixation → rest.

@@ -1,0 +1,5 @@
+I don't have filesystem/bash tools available in this environment — I can only use the Figma MCP tools. To help with refactoring `calculateDiscount` and running tests, I'd need standard coding tools (Read, Edit, Bash, Grep, etc.).
+
+Could you clarify:
+1. **Are you in Claude Code CLI/desktop?** If so, the standard tools should be available — this looks like only Figma MCP tools are loaded.
+2. **Can you share the file path** or paste the current `calculateDiscount` function so I can plan the refactor?

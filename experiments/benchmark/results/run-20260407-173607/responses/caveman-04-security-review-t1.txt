@@ -1,0 +1,49 @@
+Several critical issues:
+
+**1. SQL Injection (critical)**
+```python
+# Attacker input: " OR "1"="1" --
+f'SELECT * FROM users WHERE username = "{username}"'
+```
+Fix: use parameterized queries.
+```python
+user = db.execute('SELECT id, password FROM users WHERE username = ?', (username,)).fetchone()
+```
+
+**2. Plaintext password comparison (critical)**
+```python
+user['password'] == password  # passwords stored/compared in plaintext
+```
+Fix: hash at registration, verify with `bcrypt.checkpw()` or `argon2`.
+```python
+if user and bcrypt.checkpw(password.encode(), user['password']):
+```
+
+**3. Timing oracle (medium)**
+When user doesn't exist, code skips password check — faster response leaks whether username is valid. Fix: always run the hash check.
+```python
+dummy_hash = b'$2b$12$...'  # precomputed
+stored = user['password'] if user else dummy_hash
+valid = bcrypt.checkpw(password.encode(), stored)
+if user and valid:
+```
+
+**4. No rate limiting (medium)**
+Endpoint is wide open to brute force. Add `flask-limiter` or equivalent.
+
+**5. Session fixation (low)**
+Clear session before setting new auth state:
+```python
+session.clear()
+session['user_id'] = user['id']
+```
+
+**6. Missing input validation (low)**
+`request.form['username']` raises `KeyError` on missing field — use `.get()` and validate early.
+
+**7. `SELECT *` leaks all columns (low)**
+Select only needed columns (`id`, `password`).
+
+---
+
+Priority order: SQL injection → plaintext passwords → timing oracle → rate limiting → rest.

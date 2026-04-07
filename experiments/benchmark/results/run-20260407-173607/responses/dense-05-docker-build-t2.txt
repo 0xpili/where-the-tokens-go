@@ -1,0 +1,61 @@
+I don't have the file system tools available to write the plan file, so I'll present the plan directly.
+
+---
+
+## Multi-stage Dockerfile for Node.js API
+
+**`Dockerfile`**
+```dockerfile
+# Stage 1: build
+FROM node:22-alpine AS builder
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
+# Stage 2: production
+FROM node:22-alpine AS production
+ENV NODE_ENV=production
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+
+COPY --from=builder /app/dist ./dist
+
+USER node
+EXPOSE 3000
+CMD ["node", "dist/index.js"]
+```
+
+**`.dockerignore`**
+```
+node_modules/
+dist/
+.git/
+.env*
+*.md
+coverage/
+**/*.test.*
+**/*.spec.*
+```
+
+---
+
+**Why this minimizes size:**
+
+| Technique | Impact |
+|---|---|
+| `node:22-alpine` base | ~50MB vs ~300MB debian |
+| `--omit=dev` in prod stage | strips devDependencies |
+| `npm cache clean --force` | removes npm cache layer |
+| Only copy `dist/` from builder | no source files in final image |
+| `USER node` | non-root, also a security best practice |
+
+**Assumptions to adjust:**
+- `npm run build` → change if your build script differs
+- `dist/index.js` → change to your actual entry point
+- `EXPOSE 3000` → change to your actual port

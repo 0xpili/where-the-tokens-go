@@ -1,0 +1,58 @@
+```dockerfile
+# ── Stage 1: install dependencies ───────────────────────────────────────────
+FROM node:22-alpine AS deps
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts
+
+# ── Stage 2: build ──────────────────────────────────────────────────────────
+FROM node:22-alpine AS build
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
+
+COPY tsconfig.json ./
+COPY src ./src
+RUN npm run build
+
+# ── Stage 3: production image ───────────────────────────────────────────────
+FROM node:22-alpine AS production
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# non-root user (node ships with one on the alpine image)
+USER node
+
+COPY --chown=node:node --from=deps  /app/node_modules ./node_modules
+COPY --chown=node:node --from=build /app/dist         ./dist
+COPY --chown=node:node package.json ./
+
+EXPOSE 3000
+CMD ["node", "dist/index.js"]
+```
+
+Pair it with a `.dockerignore` to keep the build context lean:
+
+```
+node_modules
+dist
+.git
+*.md
+.env*
+coverage
+```
+
+**Why each decision shrinks the image:**
+
+| Technique | Effect |
+|---|---|
+| `node:22-alpine` base | ~55 MB vs ~360 MB for debian slim |
+| Three stages | `devDependencies` and TypeScript toolchain never land in final layer |
+| `--omit=dev` in `deps` stage | Only production `node_modules` copied over |
+| `USER node` | Security best-practice; also signals intent to run unprivileged |
+| `.dockerignore` | Prevents large dirs from being sent to the daemon |
+
+If you're not using TypeScript, drop the `build` stage and copy `src` directly. If you want to go further, `node:22-alpine` can be replaced with a custom `distroless` image (`gcr.io/distroless/nodejs22-debian12`) to shed the shell and package manager entirely.

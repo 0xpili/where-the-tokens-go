@@ -1,0 +1,22 @@
+Shared state in a common ancestor. When state updates, React re-renders the component that owns the state **and all its descendants** — even ones that don't use that state.
+
+Common causes:
+
+1. **State lives too high** — state managed in a parent/grandparent component causes all children to re-render on every update.
+
+2. **Context** — if both components share a context provider and the context value changes, all consumers re-render.
+
+3. **Redux / Zustand / other global store** — if the component subscribes to a slice of store that changes when the button is clicked.
+
+**How to diagnose:**
+
+Add `console.log('render')` to the component, click the button, and trace up the component tree to find where the shared state lives.
+
+**Fixes:**
+
+- **Move state down** — keep state as close as possible to where it's used.
+- **Memoize** — wrap the component in `React.memo` so it only re-renders when its own props change.
+- **Split context** — if using Context, separate frequently-changing values into their own provider.
+- **Selector optimization** — if using Redux/Zustand, use a selector that only subscribes to the specific slice the component needs.
+
+The most common fix is simply moving state down the tree so fewer components share it.

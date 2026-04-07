@@ -1,0 +1,1 @@
+The primary working directory looks like an LLM tokens research project — which codebase has the JWT middleware? Is it in `/Users/pili/lending-qa` or somewhere else?

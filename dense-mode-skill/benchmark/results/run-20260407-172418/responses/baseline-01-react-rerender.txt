@@ -1,0 +1,40 @@
+The most common causes, in order of likelihood:
+
+**1. Shared state in a common ancestor**
+The button updates state in a parent component, which re-renders its entire subtree — including your component.
+
+```jsx
+function Parent() {
+  const [count, setCount] = useState(0); // lives here
+  return (
+    <>
+      <ButtonComponent onClick={() => setCount(c => c + 1)} />
+      <YourComponent /> {/* re-renders every time count changes */}
+    </>
+  );
+}
+```
+
+Fix: Move state down closer to where it's actually used, or memoize:
+```jsx
+const YourComponent = React.memo(() => { ... });
+```
+
+**2. Context update**
+Both components consume the same React Context, and the button triggers a context value change. Every consumer re-renders.
+
+Fix: Split context into smaller pieces, or use a selector pattern with `useMemo`.
+
+**3. External store (Redux, Zustand, etc.)**
+Your component subscribes to a store slice that the button modifies.
+
+Fix: Make your selector more specific so it only triggers on the exact data it needs.
+
+**4. Object/function props recreated on each render**
+A parent passes `{}` or `() => {}` literals as props. Even with `React.memo`, these fail reference equality checks.
+
+Fix: `useMemo` / `useCallback` for the prop values, or move them outside the component.
+
+---
+
+To diagnose: install the [React DevTools](https://react.dev/learn/react-developer-tools) browser extension, open the Profiler tab, record an interaction, and it will show you exactly *why* each component re-rendered (state change, parent re-render, context change, etc.).

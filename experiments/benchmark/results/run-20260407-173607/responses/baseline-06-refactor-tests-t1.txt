@@ -1,0 +1,7 @@
+I don't have filesystem/bash tools available in this environment — I can only use the Figma MCP tools shown. I can't read files, search code, or run tests.
+
+To help with this refactor, I'd need:
+- A code editor or IDE with access to your project files
+- Or you can paste the `calculateDiscount` function and test file contents here
+
+Could you share the relevant code directly in the chat?

@@ -1,0 +1,3 @@
+Classic clock skew symptom. Before I plan a fix, I need to locate the JWT middleware.
+
+Which project contains the middleware — is it in `/Users/pili/lending-qa` or somewhere else? And can you share the file path (e.g., `src/middleware/auth.js`) if you know it?

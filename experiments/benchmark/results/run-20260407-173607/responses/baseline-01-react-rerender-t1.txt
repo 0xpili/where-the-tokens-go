@@ -1,0 +1,26 @@
+Most likely cause: **shared state higher up the tree**. When any state in a parent component updates, it re-renders — and so do all its children, regardless of whether they use that state.
+
+Common culprits:
+
+1. **State in a common ancestor** — both components share a parent that holds state, and the button updates it.
+
+2. **Context** — if you're using `useContext` and the context value changes, every consumer re-renders. Even ones that don't use the changed value.
+
+3. **Redux / Zustand / other global store** — a selector that isn't specific enough causes a re-render on any store update.
+
+**How to diagnose:**
+
+Add `console.log('rendered')` or use React DevTools Profiler — it shows which component triggered the cascade and why.
+
+**How to fix (pick the right tool):**
+
+| Cause | Fix |
+|---|---|
+| Unneeded parent re-render | `React.memo` on the child |
+| Expensive context | Split context or use `useMemo` on the value |
+| Bad selector | Narrow the selector to only the slice you need |
+| Object/array created inline | `useMemo` / `useCallback` to stabilize references |
+
+The most important thing: re-renders aren't always a problem. React is fast. Only optimize when you've confirmed it's causing a measurable perf issue (dropped frames, visible lag).
+
+If you want to share the actual component tree, I can give a more specific answer.

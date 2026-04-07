@@ -1,0 +1,27 @@
+No. For a 5-person team, microservices will make things worse, not better.
+
+**Why the monolith is probably slow (and the real fixes):**
+
+- **N+1 queries** — use `includes`/`preload`, check with Bullet gem
+- **Missing indexes** — run `db:schema:load` against slow queries, add indexes
+- **Synchronous work that should be async** — move to Sidekiq/GoodJob
+- **No caching** — fragment cache, Russian doll caching, Redis
+- **Fat controller/service objects doing too much in one request** — break up, defer
+
+**Why microservices would hurt you:**
+
+- 5 engineers now maintain N deployment pipelines instead of 1
+- Every feature crosses service boundaries → distributed transactions, eventual consistency headaches
+- Debugging requires tracing across services
+- Auth, logging, retries all become your problem
+- Latency goes *up*, not down (network hops)
+
+**What microservices actually solve:** *organizational* scaling — when 50+ engineers can't deploy without stepping on each other. That's not your problem.
+
+**Practical path:**
+
+1. Profile first. `rack-mini-profiler` + `flamegraph` gem. Find the actual bottleneck.
+2. Fix that specific thing (it's almost always DB or synchronous work)
+3. If one domain genuinely needs different scaling characteristics later, extract *one* service then — not a full decomposition
+
+The monolith is not the problem. A specific query or code path is. Diagnose before you rebuild.

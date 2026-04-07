@@ -1,0 +1,27 @@
+For a 5-person team: almost certainly no. Here's the honest breakdown.
+
+**Why your monolith is probably slow (and fixable without microservices):**
+- Missing database indexes
+- N+1 queries (Bullet gem will find them)
+- No caching (Redis + fragment/Russian doll caching)
+- Unoptimized background jobs (Sidekiq tuning)
+- No CDN or asset pipeline issues
+
+Fix these first. They're responsible for 80%+ of Rails slowness at your scale.
+
+**The microservices cost you'd be taking on:**
+- Network latency between services (often *worse* than monolith DB calls)
+- Distributed transactions — you lose ACID, gain coordination hell
+- Separate deploy pipelines, monitoring, logging per service
+- 5 engineers maintaining N services instead of building product
+- Eventual consistency bugs that are very hard to debug
+
+**What actually makes sense at your scale:**
+1. Profile first (`rack-mini-profiler`, `bullet`, slow query logs)
+2. Add read replicas if DB is the bottleneck
+3. Extract only truly separate *workloads* (e.g., image processing to a worker, not a "service")
+4. Consider a modular monolith (Rails engines or clear bounded contexts) if coupling is the real problem
+
+**The honest rule of thumb:** Microservices solve *organizational* scaling problems (50+ engineers stepping on each other) more than *technical* ones. At 5 people, the overhead will slow you down more than your monolith ever will.
+
+What's actually slow? Queries, pages, background jobs? That would point to a much more targeted fix.

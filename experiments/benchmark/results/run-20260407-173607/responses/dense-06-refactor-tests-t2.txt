@@ -1,0 +1,7 @@
+I don't have access to file system tools (Read, Grep, Glob, Bash) in this environment — only Figma MCP tools are available to me here.
+
+To plan this refactor, I need either:
+1. The contents of the file(s) containing `calculateDiscount` pasted directly into the chat
+2. The file path(s) so you can share them
+
+Could you paste the current `calculateDiscount` implementation and the relevant test file?

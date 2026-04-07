@@ -1,0 +1,37 @@
+Almost certainly no. Here's why:
+
+**The real problem isn't your architecture**
+
+A slow Rails monolith is almost never slow because it's a monolith. It's slow because of:
+- Missing database indexes
+- N+1 queries
+- No caching (Redis, HTTP, fragment)
+- Synchronous work that should be async (Sidekiq)
+- Unoptimized queries or missing pagination
+
+Fix those first. You'll likely get 10x improvement with a week of work.
+
+**Microservices at 5 people is a trap**
+
+What you'd be trading:
+- Simple deploys → coordinated multi-service deploys
+- One codebase → distributed system with network failure modes
+- Easy debugging → distributed tracing, log aggregation
+- One DB transaction → eventual consistency problems
+- Fast feature dev → cross-service API contracts
+
+Netflix/Uber moved to microservices *from* monoliths at hundreds of engineers because they had specific scaling needs that justified that operational cost. You don't.
+
+**What actually helps a slow Rails app**
+
+1. `rack-mini-profiler` + `bullet` gem — find the actual slow spots in minutes
+2. Add indexes on foreign keys and any column in a `where`/`order`
+3. Move slow operations to background jobs
+4. Add a read replica if DB is the bottleneck
+5. Cache aggressively (Russian doll caching, HTTP caching)
+
+**When microservices make sense for small teams**
+
+Only if you have a genuinely independent subdomain that needs a different tech stack or deployment cadence (e.g., a video processing pipeline). Even then, consider a separate Rails app or a simple job queue before a "microservice."
+
+The bottleneck at 5 people is almost always developer time, not architecture. Microservices multiply coordination cost.

@@ -1,0 +1,13 @@
+I don't have file system tools available in this environment to explore the codebase directly. Could you share the relevant code? Specifically:
+
+1. Where the JWT token is **created** (the signing code with `exp`/`expiresIn`)
+2. The **middleware** that validates it
+
+The most common cause of this exact symptom ("just created" token failing with `token expired`) is a **seconds vs milliseconds mismatch** — e.g., the `exp` claim is compared against `Date.now()` (ms) instead of `Math.floor(Date.now() / 1000)` (seconds). A correctly-set `exp` in seconds (~1.7 billion) looks expired when compared to `Date.now()` in milliseconds (~1.7 trillion).
+
+Other likely causes:
+- **Clock skew** between the service that signs the token and the one that verifies it
+- `exp` accidentally set to a tiny value (e.g., `expiresIn: 60` treated as 60ms not 60s)
+- Wrong base time used (e.g., `new Date()` object instead of Unix timestamp)
+
+Share the two code sections and I can pinpoint exactly what's wrong.

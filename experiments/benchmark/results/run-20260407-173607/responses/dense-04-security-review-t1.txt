@@ -1,0 +1,45 @@
+**Critical**
+
+**SQL Injection** — f-string interpolation lets attacker input `" OR 1=1 --` → auth bypass, data exfiltration, or table drop.
+```python
+# Fix: parameterized query
+user = db.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+```
+
+**Plaintext passwords** — `==` comparison means passwords are stored/compared unhashed. Any DB breach → full credential exposure.
+```python
+# Fix: hash at registration, verify here
+from werkzeug.security import check_password_hash
+if user and check_password_hash(user['password'], password):
+```
+
+---
+
+**Medium**
+
+**Timing attack** — `==` short-circuits, leaking how many characters match. Resolved by switching to `check_password_hash()` (constant-time comparison).
+
+**No rate limiting** — endpoint allows unlimited brute-force attempts.
+```python
+from flask_limiter import Limiter
+@limiter.limit("5/minute")
+def login(): ...
+```
+
+**Missing CSRF protection** — POST form with no token validation → cross-site request forgery. Use Flask-WTF or set `SameSite=Strict` on session cookie.
+
+---
+
+**Low**
+
+**No input length validation** — unbounded `username`/`password` inputs. Add `if len(username) > 128` guards or use a form validation library.
+
+**KeyError on missing fields** — `request.form['username']` raises 500 if field is absent. Use `request.form.get('username', '')` and validate before use.
+
+---
+
+**Summary of fixes in priority order:**
+1. Parameterized queries (blocks SQLi)
+2. `check_password_hash` (fixes plaintext + timing)
+3. Rate limiting
+4. CSRF token

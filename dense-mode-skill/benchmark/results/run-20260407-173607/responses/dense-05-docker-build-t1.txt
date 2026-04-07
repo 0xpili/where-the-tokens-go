@@ -1,0 +1,78 @@
+I don't have file write tools available in this environment, so I'll present the plan and artifacts directly.
+
+---
+
+## Plan
+
+**Two stages:**
+1. `builder` — full Node.js alpine + build tools, compile TS/bundle
+2. `production` — fresh alpine, copy only compiled output + prod deps, run as `node` user
+
+**Size optimizations:** alpine base (~50 MB vs ~350 MB debian), `npm ci --omit=dev`, cache clean in same layer, non-root user, companion `.dockerignore`
+
+---
+
+## `Dockerfile`
+
+```dockerfile
+# ── Stage 1: builder ──────────────────────────────────────────────────────────
+FROM node:22-alpine AS builder
+
+WORKDIR /app
+
+# Copy manifests first — layer cache: only re-installs when these change
+COPY package*.json ./
+
+# Install ALL deps (including devDependencies for build tools)
+RUN npm ci
+
+# Copy source and build
+COPY . .
+RUN npm run build
+
+
+# ── Stage 2: production ───────────────────────────────────────────────────────
+FROM node:22-alpine AS production
+
+ENV NODE_ENV=production
+WORKDIR /app
+
+# Copy manifests and install ONLY production deps, clean cache in one layer
+COPY package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+
+# Copy compiled output from builder (not source, not node_modules)
+COPY --from=builder /app/dist ./dist
+
+# Drop to non-root user (ships with the node image)
+USER node
+
+EXPOSE 3000
+CMD ["node", "dist/index.js"]
+```
+
+## `.dockerignore`
+
+```
+node_modules
+dist
+.git
+.gitignore
+*.md
+.env*
+.npmrc
+coverage
+.nyc_output
+*.log
+Dockerfile*
+docker-compose*
+.dockerignore
+```
+
+---
+
+**Notes:**
+- Assumes `npm run build` outputs to `dist/` and entry is `dist/index.js` — adjust if your build outputs elsewhere
+- If you don't have a build step (plain JS), remove the builder stage and just use one `FROM node:22-alpine` with `npm ci --omit=dev`
+- Final image size: typically **~160–200 MB** with alpine vs ~600 MB+ with a naive single-stage debian image
+- For even smaller images (if you don't need the Node.js runtime or npm), consider `gcr.io/distroless/nodejs22-debian12` as the production base (~90 MB)

@@ -1,0 +1,80 @@
+Four vulnerabilities, two critical:
+
+---
+
+**SQL Injection (Critical)**
+
+```python
+db.execute(f'SELECT * FROM users WHERE username = "{username}"')
+```
+Attacker sends `" OR 1=1 --` as username → auth bypass, or `"; DROP TABLE users; --` → data destruction.
+
+Fix:
+```python
+db.execute('SELECT * FROM users WHERE username = ?', (username,))
+```
+
+---
+
+**Plaintext Password Comparison (Critical)**
+
+```python
+user['password'] == password
+```
+Passwords stored/compared as plaintext → full credential dump if DB is breached.
+
+Fix:
+```python
+from werkzeug.security import check_password_hash
+check_password_hash(user['password'], password)
+```
+Passwords must also be stored via `generate_password_hash()` at registration.
+
+---
+
+**Timing Attack (Medium)**
+
+`==` short-circuits on first mismatched byte → response time leaks how many chars matched, enabling character-by-character brute force. Resolved automatically by switching to bcrypt (`check_password_hash` is constant-time).
+
+---
+
+**No Rate Limiting (Medium)**
+
+No throttle on failed attempts → unlimited brute force. Fix:
+
+```python
+from flask_limiter import Limiter
+limiter = Limiter(app, key_func=get_remote_address)
+
+@app.route('/login', methods=['POST'])
+@limiter.limit("5 per minute")
+def login():
+```
+
+---
+
+**Bonus: Session Fixation (Low)**
+
+Session ID isn't regenerated after login → an attacker who pre-sets a victim's session ID can hijack it post-login.
+
+Fix: call `session.clear()` or regenerate the session before setting `user_id`.
+
+---
+
+**Fixed version:**
+
+```python
+@app.route('/login', methods=['POST'])
+@limiter.limit("5 per minute")
+def login():
+    username = request.form.get('username', '')
+    password = request.form.get('password', '')
+    user = db.execute(
+        'SELECT * FROM users WHERE username = ?', (username,)
+    ).fetchone()
+    if user and check_password_hash(user['password'], password):
+        session.clear()  # prevent session fixation
+        session['user_id'] = user['id']
+        return redirect('/dashboard')
+    return 'Invalid credentials', 401
+```

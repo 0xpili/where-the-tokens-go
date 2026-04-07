@@ -1,0 +1,8 @@
+I don't have access to standard file-reading tools (Read, Grep, Glob, Bash) in this environment — only Figma MCP tools are available. I can't locate the `calculateDiscount` function or its tests without filesystem access.
+
+To help you refactor this, I'd need you to either:
+
+1. **Paste the function** and test file contents directly into chat
+2. **Share the file paths** — though I still can't read them without the tools
+
+Could you share the relevant code?

@@ -1,0 +1,37 @@
+Four issues, ranked by severity:
+
+**1. SQL Injection (Critical)**
+```python
+# Attacker input: " OR "1"="1" --
+f'SELECT * FROM users WHERE username = "{username}"'
+```
+Use parameterized queries:
+```python
+user = db.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+```
+
+**2. Plaintext password comparison (Critical)**
+`user['password'] == password` implies passwords are stored/compared in plaintext. Use a proper hash:
+```python
+import bcrypt
+if user and bcrypt.checkpw(password.encode(), user['password_hash']):
+```
+`==` is also vulnerable to timing attacks — `bcrypt.checkpw` uses constant-time comparison.
+
+**3. No brute-force protection (High)**
+No rate limiting or lockout. Add via `flask-limiter`:
+```python
+@limiter.limit("5 per minute")
+def login():
+```
+
+**4. Session fixation (Medium)**
+After login, regenerate the session to prevent fixation attacks:
+```python
+session.clear()
+session['user_id'] = user['id']
+```
+
+**Minor:** `request.form['username']` raises `KeyError` on missing fields — use `.get()` and validate explicitly.
+
+The SQL injection + plaintext passwords together mean this endpoint is fully compromised as-is. Fix those two first.
