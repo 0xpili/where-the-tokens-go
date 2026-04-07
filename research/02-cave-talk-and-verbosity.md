@@ -47,7 +47,7 @@ Let me trace a typical Claude Code interaction:
 - Tool calls (Read + Edit + maybe Bash): 5,000-15,000 tokens
 - The text response: 40 tokens
 
-**Cave talk saves 30 tokens out of 35,000-245,000 total. That's 0.01% to 0.08%.**
+**Per-turn, cave talk saves 30 tokens out of 35,000-245,000 total. That's 0.01% to 0.08%.** But this per-turn framing is misleading — see the Conclusion for why compounding changes the math significantly.
 
 ### When Cave Talk DOES Matter
 
@@ -59,11 +59,11 @@ Cave talk (or any verbosity reduction) matters more when:
 
 3. **You're asking for summaries/analysis** — Research tasks where Claude writes paragraphs. Here, "be concise" genuinely helps.
 
-### When Cave Talk Is A Rounding Error
+### When Cave Talk Has Minimal Per-Turn Impact
 
-- **Code editing tasks** — The tool calls (Read, Edit) dominate. The text is a minor footnote.
+- **Code editing tasks** — The tool calls (Read, Edit) dominate. The text is a minor footnote per turn (but compounds — see Conclusion).
 - **Multi-file operations** — Agent spawning, file searching, grepping. Text output is tiny compared to tool overhead.
-- **Long sessions** — Context re-sending dwarfs output tokens by 100x+.
+- **Long sessions** — Context re-sending dwarfs output tokens per turn, but compressed responses compound savings across all turns.
 
 ## The Real Verbosity Problem
 
@@ -98,10 +98,14 @@ The bigger waste isn't the final response — it's **Claude's tendency to:**
 
 ## Conclusion
 
-**Cave talk is a meme, not a strategy.** It optimizes the smallest component of token usage (visible text output) while ignoring the elephant in the room (context accumulation and tool overhead).
+**Cave talk isn't a meme — but it's Tier 4, not Tier 1.**
 
-The real wins come from:
-1. Managing your context window (/clear, /compact)
-2. Being specific to avoid search overhead
-3. Batching work to reduce round-trips
-4. Disabling unused MCP servers and keeping CLAUDE.md lean
+My original analysis here underestimated cave talk by measuring only per-turn savings (~30 tokens). [Experiment 13](13-dense-vs-cave-talk.md) ran an empirical test: 6 tasks × 4 styles. Caveman full achieves 54% output reduction, and that compounds — ~80K tokens saved over a 30-turn session (4-18% of total session cost). That's not a rounding error.
+
+But the core thesis holds: context management and tool overhead still dwarf output reduction. And **dense mode** (arrow notation, key:value, no articles/filler) beats caveman — 59% reduction, zero information loss, professional readability vs broken English. Dense mode compresses at the *structural* level (arrow notation replaces sentences), while cave talk compresses at the *word* level (dropping articles).
+
+The hierarchy remains:
+1. Managing your context window (/clear, /compact) — 30-60%
+2. Being specific to avoid search overhead — 15-30%
+3. Batching work to reduce round-trips — 20-40%
+4. Dense mode responses — 4-18% via compounding

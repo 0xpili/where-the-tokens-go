@@ -1,0 +1,8 @@
+{
+  "name": "dense-mode",
+  "description": "Reduce output tokens ~59% with structural compression — arrow notation, key:value pairs, no filler. Beats cave talk on every metric.",
+  "author": {
+    "name": "0xpili",
+    "url": "https://github.com/0xpili"
+  }
+}

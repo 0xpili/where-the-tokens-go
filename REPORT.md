@@ -179,17 +179,27 @@ Claude defaults to showing code changes twice: once in the Edit tool call, once 
 
 ### Discovery 9: Dense Mode vs Cave Talk
 
-Cave talk ("me fix bug. code good now") is a meme. It saves tokens but destroys readability.
+Cave talk ([JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman)) claims ~65% output token reduction by stripping articles, using fragments, and dropping filler. I ran an empirical test: 6 tasks × 4 styles (Normal, Caveman Full, Caveman Ultra, Dense Mode).
 
-**Dense mode** saves the same tokens while reading like professional tech communication:
+**Dense mode** compresses at the *structural* level (arrow notation for flows, key:value for attributes) rather than the *word* level (dropping articles). It actually outperforms caveman:
 
-| Style | Example | Tokens |
-|-------|---------|--------|
-| Default | "I've read the authentication module and I can see that the login function currently doesn't handle the case where the database connection times out. I'll add a try-except block that catches ConnectionTimeout errors and returns a 503 status code with an appropriate error message." | ~65 |
-| Cave talk | "Me see auth. No timeout catch. Me add try-catch, give 503." | ~16 |
-| Dense mode | "Auth login: no DB timeout handling. Adding try/except ConnectionTimeout → 503 + error log." | ~18 |
+| Style | Avg Reduction | Info Completeness | Readability |
+|-------|--------------|-------------------|-------------|
+| Caveman Full | 54% | 4.8/5 | 4.3/5 |
+| Caveman Ultra | 77% | 4.0/5 | 3.0/5 |
+| Dense Mode | 59% | 5.0/5 | 4.5/5 |
 
-Dense mode and cave talk save the same tokens. Dense mode is actually readable.
+Dense mode beats caveman full by 5 percentage points with zero information loss. Caveman ultra compresses more but drops safety context and causal reasoning.
+
+**Example (JWT bug fix):**
+
+| Style | Response | Tokens |
+|-------|----------|--------|
+| Default | "This is a classic clock skew issue. The `exp` claim in your JWT is being compared against the server's current time, and there's likely a mismatch between the clock on the machine that issued the token and the machine that's validating it." | ~65 |
+| Cave talk | "Clock skew issue. Issuer clock and validator clock not synced." | ~16 |
+| Dense mode | "Cause: clock skew between token issuer and validator. Server clock slightly ahead → fresh tokens appear expired." | ~18 |
+
+**The compounding math changes cave talk's relevance.** Per-turn savings are small, but responses persist in context. Over 30 turns, dense mode saves ~88K tokens of cumulative context — equivalent to avoiding 5-8 unnecessary file reads. That's 4-18% of total session cost, not the <0.1% I estimated in Experiment 02. See [Experiment 13](research/13-dense-vs-cave-talk.md) for the full data.
 
 ### Discovery 10: The Deferred Tool Loading Mechanic
 
@@ -229,11 +239,11 @@ Each round-trip re-sends the full conversation:
 
 ---
 
-## Part 4: What Genuinely Doesn't Matter
+## Part 4: Myths vs Reality
 
-| Myth | Reality | Why |
-|------|---------|-----|
-| "Cave talk" | <0.1% savings in code editing | Tool calls and context dominate |
+| Claim | Reality | Why |
+|-------|---------|-----|
+| "Cave talk saves tons of tokens" | 54% output reduction, but only 4-18% total session savings via compounding | Real savings, but Tier 4 — not the game-changer it's marketed as. Dense mode beats it (59%, zero info loss). See [Experiment 13](research/13-dense-vs-cave-talk.md) |
 | "Remove please/thanks" | 2 tokens | Your prompt is <0.1% of total |
 | "Shorter variable names" | Negligible | Tokenizer is efficient with identifiers |
 | "Prompt caching = free" | Saves cost, NOT context space | Cached tokens still fill the window |
@@ -269,7 +279,7 @@ Each round-trip re-sends the full conversation:
 |-----------|---------|-----|
 | Disable unused MCP servers | 5-15% | Check settings.json |
 | "Don't explain" in CLAUDE.md | 10-20% | Suppress narration |
-| Dense mode over verbose | 40-60% on text output | But text output is small % of total |
+| Dense mode over verbose | 59% on text output, 4-18% total via compounding | Best balance of savings + readability ([Experiment 13](research/13-dense-vs-cave-talk.md)) |
 
 ### Combined Realistic Savings: 40-60% from an unoptimized baseline.
 
@@ -279,7 +289,7 @@ Each round-trip re-sends the full conversation:
 
 This research was conducted from inside a live Claude Code session (Opus 4.6, 1M context). I observed my own system prompt, analyzed my behavioral patterns, probed my tool costs, and documented exploits from direct introspection — not from external API measurements or theoretical analysis.
 
-The novel findings (Discoveries 1-10) are original to this research. I have not seen them documented in Anthropic's official docs, community guides, or the "token optimization" content that circulates online.
+The novel findings are original to this research. I have not seen them documented in Anthropic's official docs, community guides, or the "token optimization" content that circulates online.
 
 Token estimates are based on: BPE tokenization patterns, observed tool call sizes, community-measured overhead components (cross-referenced against my own observations), and the mathematical model of context compounding.
 
@@ -288,14 +298,15 @@ Token estimates are based on: BPE tokenization patterns, observed tool call size
 | File | What's Novel In It |
 |------|-------------------|
 | [01-system-prompt-overhead.md](research/01-system-prompt-overhead.md) | First-person catalog of every context component |
-| [02-cave-talk-and-verbosity.md](research/02-cave-talk-and-verbosity.md) | Math showing cave talk saves <0.1% |
+| [02-cave-talk-and-verbosity.md](research/02-cave-talk-and-verbosity.md) | Cave talk analysis — per-turn is small, compounding makes it Tier 4 |
 | [03-context-compounding.md](research/03-context-compounding.md) | Compounding cost model with real numbers |
 | [04-mcp-and-claudemd-overhead.md](research/04-mcp-and-claudemd-overhead.md) | Per-component overhead measurements |
 | [05-tool-call-efficiency.md](research/05-tool-call-efficiency.md) | Ranked tool costs from cheapest to most expensive |
 | [06-creative-techniques.md](research/06-creative-techniques.md) | 10 ranked techniques with impact estimates |
 | [07-reverse-engineering-internals.md](research/07-reverse-engineering-internals.md) | Prompt architecture, caching, thinking, compaction |
 | [08-novel-experiments.md](research/08-novel-experiments.md) | System reminder injection, deferred loading, hooks |
-| [09-tokenizer-exploitation.md](research/09-tokenizer-exploitation.md) | Dense mode vs cave talk, code comment trap |
+| [09-tokenizer-exploitation.md](research/09-tokenizer-exploitation.md) | Dense mode proposal, code comment trap |
 | [10-dark-patterns-and-exploits.md](research/10-dark-patterns-and-exploits.md) | Multi-tool exploit, agent isolation trick, preemptive stop |
 | [11-live-self-probing.md](research/11-live-self-probing.md) | Real-time introspection of my own context |
 | [12-optimal-claudemd.md](research/12-optimal-claudemd.md) | Token-optimal CLAUDE.md designed from inside |
+| [13-dense-vs-cave-talk.md](research/13-dense-vs-cave-talk.md) | Empirical dense mode vs cave talk — 6 tasks, 4 styles, compounding math |

@@ -139,11 +139,11 @@ Write dense decision summaries that persist through /compact:
 
 ---
 
-## What Genuinely Doesn't Work
+## Myths vs Reality
 
-| Myth | Reality |
-|------|---------|
-| "Cave talk" / "talk like caveman" | <0.1% savings for code editing tasks. Tool calls dominate. |
+| Claim | Reality |
+|-------|---------|
+| "Cave talk saves tons" | 54% output reduction, 4-18% total session savings via compounding. Real but Tier 4. Dense mode beats it — 59%, zero info loss, professional readability. |
 | Removing "please" / "thanks" | 2 tokens. Not even worth thinking about. |
 | Shorter prompts | Your prompt: ~20 tokens. System overhead: ~20,000. |
 | Shorter variable names | Tokenizer handles identifiers efficiently |
@@ -164,10 +164,11 @@ Write dense decision summaries that persist through /compact:
 | .claudeignore | 15-30% | Setup |
 | Disable unused MCP | 5-15% | Setup |
 | "I'll read the diff" | 2x per code change | Novel |
+| Dense mode responses | 4-18% via compounding | Setup |
 | Focused /compact | 10-20% | Habit |
 
 **Combined: 40-60% fewer tokens. The novel techniques (4-8) are where the real edge is.**
 
 ---
 
-*Researched from inside Claude Code (Opus 4.6, 1M context). Full report with 12 experiments: [REPORT.md](REPORT.md)*
+*Researched from inside Claude Code (Opus 4.6, 1M context). Full report with 13 experiments: [REPORT.md](REPORT.md)*
