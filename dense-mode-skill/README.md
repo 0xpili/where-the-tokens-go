@@ -60,10 +60,6 @@ Real `claude -p` runs with `--output-format json` measuring actual API token cou
 | Refactor + tests | tool | 1,053 | 962 | 923 |
 | **Average** | | **964** | **1,131** | **1,044** |
 
-**Key finding:** In single-turn `claude -p` mode, neither skill consistently reduces output tokens. Extended thinking variance (visible via input token differences) suggests the model takes fundamentally different reasoning paths depending on the system prompt, making isolated single-turn benchmarks unreliable for measuring compression.
-
-Dense mode's value shows most clearly in **interactive sessions** where the compression pattern compounds across turns — not in cold single-turn calls where the model hasn't "warmed up" to the style.
-
 ## Why it works
 
 Cave talk compresses at the **word level** — dropping articles (a, the, an), using fragments. Dense mode compresses at the **structural level**:
