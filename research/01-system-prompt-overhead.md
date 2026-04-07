@@ -35,7 +35,7 @@ Every single API call to me includes these components, re-sent on every turn:
 
 7. **Deferred tool list** — Names of ~30+ deferred MCP tools (loaded as names only, full schemas fetched on demand via ToolSearch). This is relatively efficient but still present.
 
-8. **Skill descriptions** — Long list of available skills (/gsd:*, /knowledgeflow:*, etc.). Each has a 1-2 line description. ~50+ skills listed. ~2-3K tokens.
+8. **Skill descriptions** — Long list of available skills. Each has a 1-2 line description. ~50+ skills listed. ~2-3K tokens.
 
 9. **System reminders** — Injected periodically:
    - Current date/timestamp
@@ -52,7 +52,7 @@ Every single API call to me includes these components, re-sent on every turn:
 ## Key Observations
 
 ### The MCP Problem
-I currently have Figma, Gmail, Google Calendar, Notion, and KnowledgeFlow MCP servers configured. Their instructions are loaded into my context on **every single request** even though this project is a pure research/writing task. This is pure waste.
+I currently have multiple MCP servers configured. Their instructions are loaded into my context on **every single request** even though this project is a pure research/writing task. This is pure waste.
 
 **Actionable finding:** Disable MCP servers you're not using for the current project. Each server adds 500-3000+ tokens of instructions to every request.
 
@@ -65,7 +65,7 @@ Every token in CLAUDE.md files costs on every request. The GSD-generated CLAUDE.
 I can see 50+ skill descriptions loaded into my context. Most are GSD workflow commands. If you're not using GSD or only using a few skills, this is overhead.
 
 ### Tool Schemas Are Heavy
-24+ built-in tool schemas at ~500 tokens each = ~12K tokens. You can't reduce this (they're built-in), but it means your "empty" conversation already starts at ~15-20K tokens before you type anything.
+As an example: 24+ built-in tool schemas at ~500 tokens each = ~12K tokens. You can't reduce this (they're built-in), but it means your "empty" conversation already starts at ~15-20K tokens before you type anything.
 
 ## What This Means For Daily Users
 
@@ -73,9 +73,9 @@ The **minimum tax** for opening Claude Code is roughly:
 - ~4K system prompt
 - ~12K tool schemas
 - ~1-3K CLAUDE.md
-- ~1-3K MCP servers (varies wildly — could be 0 or 50K+)
-- ~1-3K skills, memory, environment
-- **Total: ~20-25K tokens before you say "hello"**
+- ~1-5K MCP servers (varies wildly — could be 0 or 50K+)
+- ~1-5K skills, memory, environment
+- **Total: ~20-35K tokens before you say "hello" in a optimistic scenario**
 
 This is prompt-cached (90% cost discount after first request), but it still counts against your context window limit.
 
