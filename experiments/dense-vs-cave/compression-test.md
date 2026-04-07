@@ -1,9 +1,9 @@
 # CLAUDE.md Compression Test
 
-**Subject:** `/Users/pili/lending-qa/CLAUDE.md` — 165 lines, ~10,984 bytes, ~2,400 words, ~3,120 est. tokens
+**Subject:** A real-world GSD-generated CLAUDE.md — 165 lines, ~10,984 bytes, ~2,400 words, ~3,120 est. tokens
 **Date:** 2026-04-07
 
-The lending-qa CLAUDE.md is a real-world example of GSD-generated bloat: stack manifests, alternatives tables, empty placeholder sections, workflow enforcement, and source citations. Perfect test subject.
+The test subject is a real CLAUDE.md from an API QA testing project — a typical example of GSD-generated bloat: stack manifests, alternatives tables, empty placeholder sections, workflow enforcement, and source citations. Perfect test subject.
 
 ---
 
@@ -29,19 +29,19 @@ Key sections and their approximate token cost:
 **Rules applied:** Strip articles, filler, hedging. Preserve code blocks, URLs, headings, technical terms. Keep all sections.
 
 ```markdown
-# Lending Beta QA
+# API QA Testing
 
-Repo stores manual QA test runs for Cambrian lending beta API endpoints.
+Repo stores manual QA test runs for REST API endpoints.
 
 ## Repo layout
 
-- `pili/`, `doug/`, `mati/`, `jason/` — one folder per tester
+- `alice/`, `bob/`, `carol/`, `dave/` — one folder per tester
 - Inside each: one subfolder per round (e.g. `round-1/`, `round-2/`)
 - Each round folder contains test scripts, outputs, notes
 
 ## Contributing test round
 
-1. Go to your folder (e.g. `pili/`)
+1. Go to your folder (e.g. `alice/`)
 2. Create new round folder: `round-N/`
 3. Add test files — curl scripts, response JSON, notes
 4. Include `notes.md` if bugs found
@@ -49,9 +49,9 @@ Repo stores manual QA test runs for Cambrian lending beta API endpoints.
 
 ## API details
 
-- Base URL: `https://opabinia.cambrian.network/api/beta/evm/lending`
+- Base URL: `https://api.example.com/v1/resources`
 - Auth: `X-API-Key` header (own key per tester, never commit)
-- Endpoints: `/protocols`, `/pools`
+- Endpoints: `/list`, `/detail`
 
 ## Rules
 
@@ -62,11 +62,11 @@ Repo stores manual QA test runs for Cambrian lending beta API endpoints.
 
 ## Project
 
-Lending Beta QA — Pili Round 1. Independent QA sweep of lending beta endpoints on Base chain. Tests schema correctness, filtering, sorting/pagination, edge cases.
+API QA — Alice Round 1. Independent QA sweep of REST endpoints. Tests schema correctness, filtering, sorting/pagination, edge cases.
 
 Core Value: Find bugs before production.
 
-Constraints: API key never committed, scope `pili/round-1/` only, results as `notes.md` with curl + observations, Base chain only (8453).
+Constraints: API key never committed, scope `alice/round-1/` only, results as `notes.md` with curl + observations.
 
 ## Technology Stack
 
@@ -88,9 +88,9 @@ Constraints: API key never committed, scope `pili/round-1/` only, results as `no
 ### jq Patterns
 ```bash
 # Check field type across items
-jq '[.[].borrowable | type] | unique' response.json
+jq '[.[].active | type] | unique' response.json
 # Verify sort order
-jq '[.[].supplyAPY] | . == sort | reverse' response.json
+jq '[.[].score] | . == sort | reverse' response.json
 # Check pagination overlap
 jq -s '.[0] == .[1] | not' page1.json page2.json
 ```
@@ -110,14 +110,14 @@ jq -s '.[0] == .[1] | not' page1.json page2.json
 | Selenium/Playwright | Browser tools, not API testing |
 | Jest/Mocha/pytest | Overkill for manual QA |
 
-## DeFi Testing
+## Domain-Specific Testing
 | Concern | Check |
 |---------|-------|
 | Data staleness | `updatedAt` vs current time, flag >1hr |
-| Math accuracy | `utilizationRate == borrowUSD / supplyUSD` |
-| Cross-source | Spot-check vs DeFi Llama |
-| Edge cases | Zero-TVL pools, 100% utilization |
-| Type consistency | `jq 'type'` checks (Doug found bool-vs-int bug) |
+| Math accuracy | Derived fields match source values |
+| Cross-source | Spot-check vs authoritative source |
+| Edge cases | Zero-value records, boundary conditions |
+| Type consistency | `jq 'type'` checks (found bool-vs-int bug) |
 ```
 
 **Result: ~100 lines | ~850 words | ~1,105 est. tokens**
@@ -130,36 +130,36 @@ jq -s '.[0] == .[1] | not' page1.json page2.json
 **Rules applied:** Arrow notation, key:value pairs, no articles, no filler, one sentence per concept. Merge redundant sections. Remove placeholder sections entirely.
 
 ```markdown
-# Lending Beta QA
+# API QA Testing
 
-QA test runs for Cambrian lending beta API. Base chain (8453).
+QA test runs for REST API endpoints.
 
 ## Structure
-Testers: `pili/`, `doug/`, `mati/`, `jason/` → each has `round-N/` subfolders → curl scripts + JSON responses + `notes.md`
+Testers: `alice/`, `bob/`, `carol/`, `dave/` → each has `round-N/` subfolders → curl scripts + JSON responses + `notes.md`
 
 ## API
-- URL: `https://opabinia.cambrian.network/api/beta/evm/lending`
+- URL: `https://api.example.com/v1/resources`
 - Auth: `X-API-Key` header (never commit — use `***` placeholder)
-- Endpoints: `/protocols`, `/pools`
+- Endpoints: `/list`, `/detail`
 
 ## Rules
 Own folder only. Sequential round naming. Descriptive JSON filenames. No committed keys.
 
 ## Current Scope
-Pili Round 1 → schema correctness, filtering, sorting/pagination, edge cases on `/protocols` + `/pools`.
+Alice Round 1 → schema correctness, filtering, sorting/pagination, edge cases on `/list` + `/detail`.
 
 ## Stack
 Core: curl + jq + bash. Supporting: direnv (.envrc for keys), diff (cross-run comparison), tee (save+view).
 
 ## Key jq Patterns
 ```bash
-jq '[.[].borrowable | type] | unique' r.json          # type check
-jq '[.[].supplyAPY] | . == sort | reverse' r.json     # sort verify
+jq '[.[].active | type] | unique' r.json              # type check
+jq '[.[].score] | . == sort | reverse' r.json         # sort verify
 jq -s '.[0] == .[1] | not' p1.json p2.json            # pagination overlap
 ```
 
-## DeFi Checks
-Staleness: `updatedAt` >1hr = stale. Math: `utilizationRate == borrowUSD/supplyUSD`. Cross-validate vs DeFi Llama. Edge cases: zero-TVL, 100% utilization. Types: jq type-check all fields (bool-vs-int bug precedent).
+## Domain Checks
+Staleness: `updatedAt` >1hr = stale. Math: derived fields match sources. Cross-validate vs authoritative data. Edge cases: zero-value, boundary conditions. Types: jq type-check all fields (bool-vs-int bug precedent).
 ```
 
 **Result: ~35 lines | ~230 words | ~300 est. tokens**
@@ -172,16 +172,16 @@ Staleness: `updatedAt` >1hr = stale. Math: `utilizationRate == borrowUSD/supplyU
 **Rules applied:** Remove everything Claude can infer from the repo itself. Keep only what's non-obvious or behavioral.
 
 ```markdown
-# Lending Beta QA
-API: `https://opabinia.cambrian.network/api/beta/evm/lending` with `X-API-Key` header.
-Never commit API keys. Stay in `pili/round-N/` only.
-Results as notes.md with inline curl + observations. Base chain (8453).
+# API QA Testing
+API: `https://api.example.com/v1/resources` with `X-API-Key` header.
+Never commit API keys. Stay in `alice/round-N/` only.
+Results as notes.md with inline curl + observations.
 ```
 
 **Result: 4 lines | ~35 words | ~46 est. tokens**
 **Reduction: 99% token reduction (3,120 → 46)**
 
-Claude can infer: repo layout (from ls), stack (from existing scripts), jq patterns (from existing round files), testing methodology (from notes.md files), DeFi domain knowledge (built-in). Only the API URL, auth method, key rule, and scope constraint are genuinely non-derivable.
+Claude can infer: repo layout (from ls), stack (from existing scripts), jq patterns (from existing round files), testing methodology (from notes.md files), domain knowledge (built-in). Only the API URL, auth method, key rule, and scope constraint are genuinely non-derivable.
 
 ---
 
@@ -200,7 +200,7 @@ Claude can infer: repo layout (from ls), stack (from existing scripts), jq patte
 
 Over a 50-turn session, CLAUDE.md loads every request:
 
-| Variant | Tokens × 50 turns | Cumulative overhead |
+| Variant | Tokens x 50 turns | Cumulative overhead |
 |---------|-------------------|-------------------|
 | Original | 156,000 | baseline |
 | Caveman Compress | 55,250 | -100,750 saved |

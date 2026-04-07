@@ -44,7 +44,7 @@ I'm going to enumerate everything I can observe that's been loaded into my conte
 
 6. **Memory** — MEMORY.md with 1 entry about the feedback preference
 
-7. **Environment** — macOS, zsh, /Users/pili/tokens-experiment, model info
+7. **Environment** — OS, shell, working directory path, model info
 
 8. **Plan mode info** — References to the plan file
 
