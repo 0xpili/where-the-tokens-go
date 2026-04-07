@@ -69,6 +69,7 @@ Then just build the habit of typing `/clear` between unrelated tasks. That alone
 | [10](research/10-dark-patterns-and-exploits.md) | Exploits | Multi-tool parallelism, agent isolation trick, preemptive stop |
 | [11](research/11-live-self-probing.md) | Self-probing | What Claude can actually observe about its own context |
 | [12](research/12-optimal-claudemd.md) | Optimal CLAUDE.md | 3 lines designed from inside to exploit Claude's own defaults |
+| [13](research/13-dense-vs-cave-talk.md) | Dense mode vs cave talk | Empirical test: dense mode beats caveman 59% vs 54%, zero info loss |
 
 ## How this was made
 
